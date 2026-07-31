@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="fs-small">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -14,10 +14,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        html {
-            /* 전체 글자크기 1포인트 확대 (Tailwind의 rem 기반 텍스트 크기에 비례 반영됨) */
-            font-size: 112.5%;
-        }
+        /* 글자크기 3단계 설정 (작게/보통/크게) - 기본값은 '작게' */
+        html.fs-small { font-size: 112.5%; }
+        html.fs-medium { font-size: 125%; }
+        html.fs-large { font-size: 137.5%; }
+
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #f7f5f0;
@@ -29,13 +30,53 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             -webkit-tap-highlight-color: transparent;
         }
-        /* 전체 글자크기 1포인트 확대: 고정 px 단위(text-[9px] 등)는 rem 확대가 적용되지 않으므로 별도 보정 */
-        .text-\[9px\] { font-size: 11px !important; }
-        .text-\[10px\] { font-size: 12px !important; }
-        .text-\[11px\] { font-size: 13px !important; }
+        /* 고정 px 단위(text-[9px] 등)는 위 rem 확대가 적용되지 않으므로 글자크기 단계별로 별도 보정 */
+        html.fs-small .text-\[9px\] { font-size: 11px !important; }
+        html.fs-small .text-\[10px\] { font-size: 12px !important; }
+        html.fs-small .text-\[11px\] { font-size: 13px !important; }
+        html.fs-medium .text-\[9px\] { font-size: 12px !important; }
+        html.fs-medium .text-\[10px\] { font-size: 13px !important; }
+        html.fs-medium .text-\[11px\] { font-size: 14px !important; }
+        html.fs-large .text-\[9px\] { font-size: 13px !important; }
+        html.fs-large .text-\[10px\] { font-size: 14px !important; }
+        html.fs-large .text-\[11px\] { font-size: 15px !important; }
+
+        /* PC(16:9) / 모바일(9:16) 반응형 화면 비율 프레임 */
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #d6d3cc;
+        }
+        #app-frame {
+            position: relative;
+            background-color: #f7f5f0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+        }
+        /* 모바일 기본: 9:16 세로 비율 */
+        #app-frame {
+            width: min(100vw, 56.25vh);
+            height: min(177.78vw, 100vh);
+            max-height: 100vh;
+        }
+        /* PC(가로 폭 768px 이상): 16:9 가로 비율 */
+        @media (min-width: 768px) {
+            #app-frame {
+                width: min(96vw, 170.67vh);
+                height: min(54vw, 96vh);
+                aspect-ratio: 16 / 9;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between text-stone-800 antialiased selection:bg-emerald-100 selection:text-emerald-900 relative">
+<body>
+<div id="app-frame" class="flex flex-col justify-between text-stone-800 antialiased selection:bg-emerald-100 selection:text-emerald-900">
 
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[250px] bg-gradient-to-b from-emerald-50/60 to-transparent pointer-events-none -z-10 rounded-full blur-3xl"></div>
 
@@ -52,6 +93,11 @@
                 <p class="text-xs sm:text-sm font-bold text-emerald-950 font-traditional tracking-wide text-right flex-grow">
                     "내 몸에 맞는 한 끼, 내일의 건강이 됩니다"
                 </p>
+                <div id="fs-toggle" class="flex-shrink-0 flex items-center gap-0.5 bg-stone-100 rounded-full p-0.5">
+                    <button id="fs-btn-small" onclick="setFontSize('small')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">작게</button>
+                    <button id="fs-btn-medium" onclick="setFontSize('medium')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">보통</button>
+                    <button id="fs-btn-large" onclick="setFontSize('large')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">크게</button>
+                </div>
                 <button id="auth-btn" onclick="openAuthModal()" class="flex-shrink-0 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5 hover:bg-emerald-100 transition-colors whitespace-nowrap">
                     <i class="fa-solid fa-user mr-1"></i><span id="auth-btn-label">로그인</span>
                 </button>
@@ -65,6 +111,7 @@
                 <div class="hidden md:flex items-center justify-center gap-1 py-1.5">
                     <button onclick="showPage('intro')" data-menu="intro" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">소개</button>
                     <button onclick="showPage('eat')" data-menu="eat" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">오늘뭐먹지?</button>
+                    <button onclick="showPage('meal')" data-menu="meal" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">식사기록</button>
                     <button onclick="showPage('board')" data-menu="board" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">소통창</button>
                     <button onclick="showPage('memberBoard')" data-menu="memberBoard" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">회원소통창</button>
                     <button id="admin-menu-btn-desktop" onclick="showPage('admin')" data-menu="admin" class="menu-btn hidden flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-amber-300 transition-colors hover:bg-emerald-900">관리자</button>
@@ -78,6 +125,7 @@
                     <div id="mobile-menu-list" class="hidden pb-2 space-y-1">
                         <button onclick="showPage('intro')" data-menu="intro" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">소개</button>
                         <button onclick="showPage('eat')" data-menu="eat" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">오늘뭐먹지?</button>
+                        <button onclick="showPage('meal')" data-menu="meal" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">식사기록</button>
                         <button onclick="showPage('board')" data-menu="board" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">소통창</button>
                         <button onclick="showPage('memberBoard')" data-menu="memberBoard" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">회원소통창</button>
                         <button id="admin-menu-btn-mobile" onclick="showPage('admin')" data-menu="admin" class="menu-btn hidden w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-amber-300 transition-colors hover:bg-emerald-900">관리자</button>
@@ -240,69 +288,24 @@
                 </div>
             </div>
 
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
+                <h4 class="text-xs font-bold text-emerald-900 flex items-center">
+                    <i class="fa-solid fa-circle-info text-emerald-700 mr-1.5"></i> 오늘 드신 음식, 이렇게 기록해보세요
+                </h4>
+                <ol class="text-[11px] text-emerald-900/80 leading-relaxed list-decimal list-inside space-y-0.5">
+                    <li>아래 <b>"식사 기록"</b> 탭을 눌러주세요</li>
+                    <li><b>날짜 · 식사 유형(직접 먹은 음식 / 배달·주문 음식)</b>을 선택해주세요</li>
+                    <li><b>음식 이름</b>을 입력하고 <b>저장</b> 버튼을 눌러주세요</li>
+                </ol>
+                <button onclick="showPage('meal')" class="w-full mt-1 bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> 지금 바로 식사 기록하러 가기
+                </button>
+            </div>
+
             <div class="pt-2">
                 <button onclick="resetUserProfile()" class="w-full bg-stone-800 hover:bg-stone-900 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-md transition-all active:scale-[0.99]">
                     <i class="fa-solid fa-arrows-rotate"></i> <span>건강 정보 및 프로필 등록 / 변경하기</span>
                 </button>
-            </div>
-        </div>
-
-        <!-- 식사 기록 화면 -->
-        <div id="history-screen" class="hidden space-y-4">
-            <!-- [배치 1] 새로운 식사 기록 추가 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
-                <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center">
-                    <i class="fa-solid fa-pen-to-square text-emerald-800 mr-1.5"></i> 새로운 식사 기록 추가
-                </h4>
-                
-                <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-600 mb-1">날짜</label>
-                            <input type="date" id="meal-date" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-600 mb-1">식사 유형</label>
-                            <select id="meal-type" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
-                                <option value="eat">직접 먹은 음식</option>
-                                <option value="delivery">배달/주문 음식</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-[10px] font-bold text-stone-600 mb-1">음식 이름</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="meal-name" placeholder="예: 전복 물회, 버섯 불고기..." class="flex-grow p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
-                            <button onclick="addMealRecord()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 rounded-xl text-xs whitespace-nowrap transition-all active:scale-[0.95]">
-                                저장
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- [배치 2] 최근 식사에 대한 건강 정보 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-rose-700">
-                <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center">
-                    <i class="fa-solid fa-heart-pulse text-rose-700 mr-1.5 animate-pulse"></i> 최근 식사에 대한 건강 정보
-                </h4>
-                <div id="meal-analysis-container" class="space-y-2 text-xs leading-relaxed"></div>
-            </div>
-
-            <!-- [배치 3] 나의 식사 히스토리 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
-                <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center justify-between">
-                    <span><i class="fa-solid fa-clock-rotate-left text-stone-600 mr-1.5"></i> 나의 식사 히스토리</span>
-                    <span class="text-[10px] font-normal text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">최근 일자순</span>
-                </h4>
-                
-                <div id="meal-history-container" class="space-y-2 mt-3"></div>
-                
-                <div id="empty-history-msg" class="hidden text-center py-6">
-                    <i class="fa-solid fa-folder-open text-stone-300 text-2xl mb-2"></i>
-                    <p class="text-xs text-stone-500">아직 등록된 식사 기록이 없습니다.</p>
-                </div>
             </div>
         </div>
 
@@ -357,6 +360,68 @@
 
         </div><!-- /page-eat -->
 
+        <!-- ============ [페이지: 식사기록] ============ -->
+        <div id="page-meal" class="hidden space-y-4">
+            <!-- [배치 1] 새로운 식사 기록 추가 -->
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+                <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center">
+                    <i class="fa-solid fa-pen-to-square text-emerald-800 mr-1.5"></i> 새로운 식사 기록 추가
+                </h4>
+                <p class="text-[10px] text-stone-400 mb-3 leading-relaxed">
+                    <i class="fa-solid fa-circle-info mr-1"></i>날짜 · 식사 유형을 선택하고, 음식 이름을 입력한 뒤 <b class="text-stone-500">저장</b> 버튼을 누르면 기록됩니다.
+                </p>
+                
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-600 mb-1">날짜</label>
+                            <input type="date" id="meal-date" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-600 mb-1">식사 유형</label>
+                            <select id="meal-type" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                                <option value="eat">직접 먹은 음식</option>
+                                <option value="delivery">배달/주문 음식</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-600 mb-1">음식 이름</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="meal-name" placeholder="예: 전복 물회, 버섯 불고기..." class="flex-grow p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                            <button onclick="addMealRecord()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 rounded-xl text-xs whitespace-nowrap transition-all active:scale-[0.95]">
+                                저장
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- [배치 2] 최근 식사에 대한 건강 정보 -->
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-rose-700">
+                <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center">
+                    <i class="fa-solid fa-heart-pulse text-rose-700 mr-1.5 animate-pulse"></i> 최근 식사에 대한 건강 정보
+                </h4>
+                <div id="meal-analysis-container" class="space-y-2 text-xs leading-relaxed"></div>
+            </div>
+
+            <!-- [배치 3] 나의 식사 히스토리 -->
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+                <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center justify-between">
+                    <span><i class="fa-solid fa-clock-rotate-left text-stone-600 mr-1.5"></i> 나의 식사 히스토리</span>
+                    <span class="text-[10px] font-normal text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">최근 일자순</span>
+                </h4>
+                
+                <div id="meal-history-container" class="space-y-2 mt-3"></div>
+                
+                <div id="empty-history-msg" class="hidden text-center py-6">
+                    <i class="fa-solid fa-folder-open text-stone-300 text-2xl mb-2"></i>
+                    <p class="text-xs text-stone-500">아직 등록된 식사 기록이 없습니다.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- ============ [페이지: 소개] ============ -->
         <div id="page-intro" class="hidden space-y-4">
             <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5">
@@ -394,6 +459,16 @@
                 <p class="text-[10px] text-stone-500 mt-3 leading-relaxed">
                     <i class="fa-solid fa-circle-info text-emerald-800 mr-1"></i>
                     회원이 되시면 위치 · 최근 식사 기록 · 배달 데이터를 함께 활용하여 더욱 정확하고 만족스러운 오늘의 메뉴를 추천해 드립니다.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5 text-center">
+                <h3 class="text-sm font-bold text-stone-900 font-traditional mb-3">
+                    <i class="fa-solid fa-qrcode text-emerald-800 mr-1.5"></i>QR코드로 바로가기
+                </h3>
+                <img src="data:image/png;base64,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" alt="오늘뭐먹지 바로가기 QR코드" class="w-40 h-40 mx-auto rounded-xl border border-stone-100">
+                <p class="text-[11px] text-stone-500 mt-3 leading-relaxed">
+                    스마트폰 카메라로 QR코드를 스캔하면 이 사이트로 바로 접속할 수 있습니다.
                 </p>
             </div>
         </div>
@@ -478,20 +553,6 @@
 
     </main>
 
-    <!-- 하단 네비게이션 탭 -->
-    <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-stone-200 pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <div class="max-w-xl mx-auto flex">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 py-3 text-emerald-800 font-bold text-xs flex flex-col items-center gap-1 transition-colors">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span>홈</span>
-            </button>
-            <button onclick="switchTab('history')" id="nav-history" class="flex-1 py-3 text-stone-400 hover:text-stone-600 font-medium text-xs flex flex-col items-center gap-1 transition-colors">
-                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
-                <span>식사 기록</span>
-            </button>
-        </div>
-    </nav>
-
     <!-- 푸터 영역 -->
     <footer class="border-t border-stone-200/60 bg-stone-100/50 py-5 pb-24 text-center text-[10px] text-stone-400">
         <div class="max-w-xl mx-auto px-4 space-y-3.5 leading-relaxed flex flex-col items-center">
@@ -514,7 +575,7 @@
     </footer>
 
     <!-- 로그인 / 회원가입 모달 -->
-    <div id="auth-modal" class="hidden fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onclick="closeAuthModalOutside(event)">
+    <div id="auth-modal" class="hidden absolute inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onclick="closeAuthModalOutside(event)">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 relative" onclick="event.stopPropagation()">
             <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-stone-400 hover:text-stone-600">
                 <i class="fa-solid fa-xmark"></i>
@@ -553,6 +614,7 @@
             </div>
         </div>
     </div>
+    </div><!-- /app-frame -->
 
     <script>
         const questions = [
@@ -657,10 +719,8 @@
 
         const welcomeScreen = document.getElementById('welcome-screen');
         const mainDashboard = document.getElementById('main-dashboard');
-        const historyScreen = document.getElementById('history-screen');
         const testScreen = document.getElementById('test-screen');
         const loadingScreen = document.getElementById('loading-screen');
-        const bottomNav = document.getElementById('bottom-nav');
 
         const questionCategory = document.getElementById('question-category');
         const currentIndexSpan = document.getElementById('current-index');
@@ -676,6 +736,7 @@
         window.onload = function() {
             captureEnvironment();
             checkUserProfile();
+            initFontSize();
             showPage('eat');
             
             const today = new Date().toISOString().split('T')[0];
@@ -685,10 +746,34 @@
         };
 
         /* =========================================================
+           글자크기 설정 (작게 / 보통 / 크게) - 기본값 '작게'
+        ========================================================= */
+        function initFontSize() {
+            const saved = localStorage.getItem('font_size_pref') || 'small';
+            setFontSize(saved);
+        }
+
+        function setFontSize(size) {
+            document.documentElement.classList.remove('fs-small', 'fs-medium', 'fs-large');
+            document.documentElement.classList.add('fs-' + size);
+            localStorage.setItem('font_size_pref', size);
+
+            document.querySelectorAll('.fs-btn').forEach(function (btn) {
+                btn.classList.remove('bg-emerald-800', 'text-white');
+                btn.classList.add('text-stone-500');
+            });
+            const activeBtn = document.getElementById('fs-btn-' + size);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-emerald-800', 'text-white');
+                activeBtn.classList.remove('text-stone-500');
+            }
+        }
+
+        /* =========================================================
            메뉴 / 페이지 전환
         ========================================================= */
         function showPage(page) {
-            ['eat', 'intro', 'board', 'memberBoard', 'admin'].forEach(function(p) {
+            ['eat', 'meal', 'intro', 'board', 'memberBoard', 'admin'].forEach(function(p) {
                 const el = document.getElementById('page-' + p);
                 if (el) el.classList.toggle('hidden', p !== page);
             });
@@ -700,23 +785,17 @@
                 btn.classList.toggle('text-white/80', !active);
             });
 
-            const labelMap = { intro: '소개', eat: '오늘뭐먹지?', board: '소통창', memberBoard: '회원소통창', admin: '관리자' };
+            const labelMap = { intro: '소개', eat: '오늘뭐먹지?', meal: '식사기록', board: '소통창', memberBoard: '회원소통창', admin: '관리자' };
             document.getElementById('mobile-menu-current').innerHTML = '<i class="fa-solid fa-bars mr-2"></i>' + labelMap[page];
             document.getElementById('mobile-menu-list').classList.add('hidden');
             document.getElementById('mobile-menu-icon').classList.remove('rotate-180');
 
-            if (page === 'eat') {
-                const profile = JSON.parse(localStorage.getItem('sasang_user_profile'));
-                if (profile) bottomNav.classList.remove('hidden');
-            } else {
-                bottomNav.classList.add('hidden');
-            }
-
+            if (page === 'meal') renderMealHistory();
             if (page === 'board') renderBoard('board');
             if (page === 'memberBoard') renderBoard('mb');
             if (page === 'admin' && window.fbRenderAdmin) window.fbRenderAdmin();
 
-            window.scrollTo(0, 0);
+            document.getElementById('app-frame').scrollTo(0, 0);
         }
 
         function toggleMobileMenu() {
@@ -747,41 +826,10 @@
             if (!profile) {
                 welcomeScreen.classList.remove('hidden');
                 mainDashboard.classList.add('hidden');
-                historyScreen.classList.add('hidden');
-                bottomNav.classList.add('hidden');
             } else {
                 welcomeScreen.classList.add('hidden');
                 mainDashboard.classList.remove('hidden');
-                bottomNav.classList.remove('hidden');
                 renderDashboard(profile);
-            }
-        }
-
-        function switchTab(tabId) {
-            const navDashboard = document.getElementById('nav-dashboard');
-            const navHistory = document.getElementById('nav-history');
-
-            if (tabId === 'dashboard') {
-                mainDashboard.classList.remove('hidden');
-                historyScreen.classList.add('hidden');
-                
-                navDashboard.classList.replace('text-stone-400', 'text-emerald-800');
-                navDashboard.classList.replace('font-medium', 'font-bold');
-                navHistory.classList.replace('text-emerald-800', 'text-stone-400');
-                navHistory.classList.replace('font-bold', 'font-medium');
-                
-                const profile = JSON.parse(localStorage.getItem('sasang_user_profile'));
-                if (profile) renderDashboard(profile);
-            } else if (tabId === 'history') {
-                mainDashboard.classList.add('hidden');
-                historyScreen.classList.remove('hidden');
-                
-                navHistory.classList.replace('text-stone-400', 'text-emerald-800');
-                navHistory.classList.replace('font-medium', 'font-bold');
-                navDashboard.classList.replace('text-emerald-800', 'text-stone-400');
-                navDashboard.classList.replace('font-bold', 'font-medium');
-                
-                renderMealHistory();
             }
         }
 
