@@ -1,0 +1,75 @@
+rules_version = '2';
+
+// Firebase 콘솔 > Firestore Database > 규칙 탭에 이 내용을 붙여넣고 "게시"하세요.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function memberDoc(uid) {
+      return get(/databases/$(database)/documents/members/$(uid)).data;
+    }
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/members/$(request.auth.uid))
+        && memberDoc(request.auth.uid).role == 'admin';
+    }
+    function isApprovedMember() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/members/$(request.auth.uid))
+        && memberDoc(request.auth.uid).status == 'approved';
+    }
+
+    // 회원 정보 (아이디/이름/전화번호/이메일/승인상태/역할)
+    match /members/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+
+      // 최초 가입 시 본인 문서만 생성 가능, role/status는 반드시 기본값으로만 생성 가능
+      allow create: if isOwner(uid)
+                    && request.resource.data.role == 'member'
+                    && request.resource.data.status == 'pending';
+
+      // 관리자는 자유롭게 수정(승인/역할 변경) 가능
+      // 본인은 role/status를 제외한 나머지 정보만 수정 가능
+      allow update: if isAdmin()
+                    || (isOwner(uid)
+                        && request.resource.data.role == resource.data.role
+                        && request.resource.data.status == resource.data.status);
+
+      // 강제 탈퇴(회원 자격 박탈)는 관리자만 가능
+      // ※ 이 규칙은 Firestore 문서만 삭제합니다. 실제 로그인 계정(Firebase Auth) 자체를
+      //    삭제하려면 Cloud Functions(Admin SDK)를 이용한 서버 측 처리가 별도로 필요합니다.
+      allow delete: if isAdmin();
+
+      // 회원별 식사 기록: 본인만 읽기/쓰기 가능
+      match /mealRecords/{recordId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // 게시글 (소통창 = board, 회원소통창 = mb)
+    match /posts/{postId} {
+      allow read: if resource.data.board == 'board' || isApprovedMember() || isAdmin();
+
+      allow create: if isSignedIn()
+                    && request.resource.data.authorId == request.auth.uid
+                    && (request.resource.data.board == 'board' || isApprovedMember() || isAdmin());
+
+      // 좋아요 수 증가, 댓글 배열 추가/삭제를 허용하기 위해 update는 로그인 사용자에게 열어둡니다.
+      // ⚠️ 운영 단계에서는 댓글을 서브컬렉션으로 분리하고 필드 단위로 더 엄격히 제한하는 것을 권장합니다.
+      allow update: if isSignedIn();
+
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.authorId == request.auth.uid);
+    }
+
+    // 방문자 통계 (오늘/누적)
+    match /stats/visits {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}

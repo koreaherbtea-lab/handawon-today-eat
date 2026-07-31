@@ -16,7 +16,7 @@
     <style>
         html {
             /* 전체 글자크기 1포인트 확대 (Tailwind의 rem 기반 텍스트 크기에 비례 반영됨) */
-            font-size: 106.25%;
+            font-size: 112.5%;
         }
         body {
             font-family: 'Noto Sans KR', sans-serif;
@@ -30,9 +30,9 @@
             -webkit-tap-highlight-color: transparent;
         }
         /* 전체 글자크기 1포인트 확대: 고정 px 단위(text-[9px] 등)는 rem 확대가 적용되지 않으므로 별도 보정 */
-        .text-\[9px\] { font-size: 10px !important; }
-        .text-\[10px\] { font-size: 11px !important; }
-        .text-\[11px\] { font-size: 12px !important; }
+        .text-\[9px\] { font-size: 11px !important; }
+        .text-\[10px\] { font-size: 12px !important; }
+        .text-\[11px\] { font-size: 13px !important; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between text-stone-800 antialiased selection:bg-emerald-100 selection:text-emerald-900 relative">
@@ -67,6 +67,7 @@
                     <button onclick="showPage('eat')" data-menu="eat" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">오늘뭐먹지?</button>
                     <button onclick="showPage('board')" data-menu="board" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">소통창</button>
                     <button onclick="showPage('memberBoard')" data-menu="memberBoard" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">회원소통창</button>
+                    <button id="admin-menu-btn-desktop" onclick="showPage('admin')" data-menu="admin" class="menu-btn hidden flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-amber-300 transition-colors hover:bg-emerald-900">관리자</button>
                 </div>
                 <!-- 모바일 클릭형 세로 메뉴 -->
                 <div class="md:hidden">
@@ -79,6 +80,7 @@
                         <button onclick="showPage('eat')" data-menu="eat" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">오늘뭐먹지?</button>
                         <button onclick="showPage('board')" data-menu="board" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">소통창</button>
                         <button onclick="showPage('memberBoard')" data-menu="memberBoard" class="menu-btn w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">회원소통창</button>
+                        <button id="admin-menu-btn-mobile" onclick="showPage('admin')" data-menu="admin" class="menu-btn hidden w-full text-left py-2.5 px-3 text-xs font-bold rounded-lg text-amber-300 transition-colors hover:bg-emerald-900">관리자</button>
                     </div>
                 </div>
             </div>
@@ -449,6 +451,31 @@
             <div id="mb-pagination" class="flex justify-center flex-wrap gap-1.5 pt-2"></div>
         </div>
 
+        <!-- ============ [페이지: 관리자] ============ -->
+        <div id="page-admin" class="hidden space-y-4">
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-[11px] text-amber-900 leading-relaxed">
+                <i class="fa-solid fa-shield-halved mr-1"></i> 관리자 전용 페이지입니다. 회원 승인 대기 명단과 전체 회원 목록을 확인하고, 문제가 있는 회원은 강제 탈퇴시킬 수 있습니다.
+            </div>
+
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 space-y-3">
+                <h4 class="text-sm font-bold text-stone-900 font-traditional flex items-center">
+                    <i class="fa-solid fa-hourglass-half text-amber-700 mr-1.5"></i> 승인 대기 회원
+                </h4>
+                <div id="admin-pending-list" class="space-y-2">
+                    <p class="text-[11px] text-stone-400">불러오는 중...</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 space-y-3">
+                <h4 class="text-sm font-bold text-stone-900 font-traditional flex items-center">
+                    <i class="fa-solid fa-users text-emerald-800 mr-1.5"></i> 전체 회원 명단
+                </h4>
+                <div id="admin-member-list" class="space-y-2">
+                    <p class="text-[11px] text-stone-400">불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- 하단 네비게이션 탭 -->
@@ -503,24 +530,25 @@
                 <input type="text" id="login-id" placeholder="아이디" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
                 <input type="password" id="login-pw" placeholder="비밀번호" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
                 <button onclick="submitLogin()" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">로그인</button>
-                <button onclick="googleLoginDemo()" class="w-full bg-white border border-stone-200 text-stone-700 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 hover:bg-stone-50 transition-all">
+                <button onclick="googleLogin()" class="w-full bg-white border border-stone-200 text-stone-700 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 hover:bg-stone-50 transition-all">
                     <i class="fa-brands fa-google text-red-500"></i> Google로 로그인
                 </button>
                 <p class="text-[10px] text-stone-400 leading-relaxed pt-1">
-                    <i class="fa-solid fa-circle-info mr-1"></i>데모 버전: 회원가입 시 입력한 아이디/비밀번호로 로그인해 보실 수 있습니다.
+                    <i class="fa-solid fa-circle-info mr-1"></i>가입하신 아이디/비밀번호 또는 Google 계정으로 로그인하세요. 승인 대기 중인 계정은 회원소통창 등 회원 전용 기능이 제한됩니다.
                 </p>
+                <p id="login-status-msg" class="hidden text-[10px] text-amber-600 leading-relaxed"></p>
             </div>
 
             <!-- 회원가입 폼 -->
             <div id="auth-signup" class="hidden space-y-2.5">
-                <input type="text" id="signup-id" placeholder="아이디" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
-                <input type="password" id="signup-pw" placeholder="비밀번호" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                <input type="text" id="signup-id" placeholder="아이디 (영문/숫자, 4자 이상)" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                <input type="password" id="signup-pw" placeholder="비밀번호 (6자 이상)" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
                 <input type="text" id="signup-name" placeholder="이름" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
                 <input type="tel" id="signup-phone" placeholder="전화번호" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
                 <input type="email" id="signup-email" placeholder="이메일" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
                 <button onclick="submitSignup()" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">회원가입 신청</button>
                 <p class="text-[10px] text-stone-400 leading-relaxed">
-                    신청 후 관리자 승인이 완료되면 회원소통창 등 회원 전용 기능을 이용하실 수 있습니다. (데모 버전에서는 가입 즉시 로그인이 가능합니다.)
+                    신청 후 관리자 승인이 완료되면 회원소통창 등 회원 전용 기능을 이용하실 수 있습니다.
                 </p>
             </div>
         </div>
@@ -624,7 +652,7 @@
         let geoInfo = { address: "전북특별자치도 완주군" };
         let weatherInfo = { temp: 24, text: "흐림" };
         let mealPeriod = 'lunch'; // 'breakfast' | 'lunch' | 'dinner'
-        let mealRecords = [];
+        window.mealRecords = [];
         let currentDeliveryTier = 'over30k';
 
         const welcomeScreen = document.getElementById('welcome-screen');
@@ -647,22 +675,22 @@
 
         window.onload = function() {
             captureEnvironment();
-            updateAuthUI();
             checkUserProfile();
-            loadMealRecords();
-            updateVisitorCount();
             showPage('eat');
             
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('meal-date').value = today;
+            // updateAuthUI(), 게시판/식사기록/방문자수 초기화는
+            // Firebase 인증 상태가 확정된 뒤 <script type="module">에서 진행됩니다.
         };
 
         /* =========================================================
            메뉴 / 페이지 전환
         ========================================================= */
         function showPage(page) {
-            ['eat', 'intro', 'board', 'memberBoard'].forEach(function(p) {
-                document.getElementById('page-' + p).classList.toggle('hidden', p !== page);
+            ['eat', 'intro', 'board', 'memberBoard', 'admin'].forEach(function(p) {
+                const el = document.getElementById('page-' + p);
+                if (el) el.classList.toggle('hidden', p !== page);
             });
 
             document.querySelectorAll('.menu-btn').forEach(function(btn) {
@@ -672,7 +700,7 @@
                 btn.classList.toggle('text-white/80', !active);
             });
 
-            const labelMap = { intro: '소개', eat: '오늘뭐먹지?', board: '소통창', memberBoard: '회원소통창' };
+            const labelMap = { intro: '소개', eat: '오늘뭐먹지?', board: '소통창', memberBoard: '회원소통창', admin: '관리자' };
             document.getElementById('mobile-menu-current').innerHTML = '<i class="fa-solid fa-bars mr-2"></i>' + labelMap[page];
             document.getElementById('mobile-menu-list').classList.add('hidden');
             document.getElementById('mobile-menu-icon').classList.remove('rotate-180');
@@ -686,6 +714,7 @@
 
             if (page === 'board') renderBoard('board');
             if (page === 'memberBoard') renderBoard('mb');
+            if (page === 'admin' && window.fbRenderAdmin) window.fbRenderAdmin();
 
             window.scrollTo(0, 0);
         }
@@ -696,445 +725,14 @@
         }
 
         /* =========================================================
-           방문자 수 (오늘 / 누적) - localStorage 기반 데모 구현
-           * 실제 서비스에서는 Firebase 등 서버 DB에 방문 로그를 POST/GET 하도록 교체하세요.
+           방문자 수 / 회원 인증 (로그인·회원가입·Google 로그인)
+           * 실제 구현은 하단의 <script type="module"> (Firebase Auth/Firestore) 참고
+           * getCurrentUser(), getAuthorId(), isAdmin() 은 그 모듈에서 window에 등록됩니다.
         ========================================================= */
-        function updateVisitorCount() {
-            const todayKey = 'visit_' + new Date().toISOString().split('T')[0];
-            let today = parseInt(localStorage.getItem(todayKey) || '0', 10);
-            let total = parseInt(localStorage.getItem('visit_total') || '0', 10);
-
-            if (!sessionStorage.getItem('visited_this_session')) {
-                today += 1;
-                total += 1;
-                localStorage.setItem(todayKey, String(today));
-                localStorage.setItem('visit_total', String(total));
-                sessionStorage.setItem('visited_this_session', '1');
-            }
-            document.getElementById('visitor-today').innerText = today.toLocaleString();
-            document.getElementById('visitor-total').innerText = total.toLocaleString();
-        }
-
         /* =========================================================
-           회원 인증 (로그인 / 회원가입) - 데모 구현
-           * 실제 서비스에서는 비밀번호 해싱 + 서버 인증 + Firebase Auth(Google 소셜 로그인 포함)로 교체하세요.
-           * 관리자 승인 절차는 이번 데모에서는 가입 즉시 로그인 가능하도록 단순화했습니다.
+           소통창 / 회원소통창 게시판 및 좋아요
+           * 실제 구현은 하단의 <script type="module"> (Firebase Firestore) 참고
         ========================================================= */
-        function getDeviceId() {
-            let id = localStorage.getItem('device_id');
-            if (!id) {
-                id = 'guest_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-                localStorage.setItem('device_id', id);
-            }
-            return id;
-        }
-
-        function getCurrentUser() {
-            const raw = localStorage.getItem('current_user');
-            return raw ? JSON.parse(raw) : null;
-        }
-
-        function getAuthorId() {
-            const cu = getCurrentUser();
-            return cu ? cu.id : getDeviceId();
-        }
-
-        function isAdmin() {
-            const cu = getCurrentUser();
-            return !!(cu && cu.role === 'admin');
-        }
-
-        function openAuthModal() {
-            const cu = getCurrentUser();
-            if (cu) {
-                if (confirm(cu.name + '님으로 로그인되어 있습니다. 로그아웃 하시겠습니까?')) {
-                    logout();
-                }
-                return;
-            }
-            document.getElementById('auth-modal').classList.remove('hidden');
-            switchAuthTab('login');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('auth-modal').classList.add('hidden');
-        }
-
-        function closeAuthModalOutside(e) {
-            if (e.target.id === 'auth-modal') closeAuthModal();
-        }
-
-        function switchAuthTab(tab) {
-            const loginTab = document.getElementById('tab-login');
-            const signupTab = document.getElementById('tab-signup');
-            const loginForm = document.getElementById('auth-login');
-            const signupForm = document.getElementById('auth-signup');
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden'); signupForm.classList.add('hidden');
-                loginTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-emerald-800 text-white transition-colors";
-                signupTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-stone-100 text-stone-500 transition-colors";
-            } else {
-                signupForm.classList.remove('hidden'); loginForm.classList.add('hidden');
-                signupTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-emerald-800 text-white transition-colors";
-                loginTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-stone-100 text-stone-500 transition-colors";
-            }
-        }
-
-        function submitSignup() {
-            const id = document.getElementById('signup-id').value.trim();
-            const pw = document.getElementById('signup-pw').value.trim();
-            const name = document.getElementById('signup-name').value.trim();
-            const phone = document.getElementById('signup-phone').value.trim();
-            const email = document.getElementById('signup-email').value.trim();
-
-            if (!id || !pw || !name || !phone || !email) {
-                alert('모든 항목을 입력해 주세요.');
-                return;
-            }
-
-            const members = JSON.parse(localStorage.getItem('members') || '[]');
-            if (members.some(function(m) { return m.id === id; })) {
-                alert('이미 사용 중인 아이디입니다.');
-                return;
-            }
-            members.push({ id: id, pw: pw, name: name, phone: phone, email: email, role: 'member', joinedAt: new Date().toISOString() });
-            localStorage.setItem('members', JSON.stringify(members));
-
-            alert('회원가입 신청이 완료되었습니다. (데모 버전) 입력하신 아이디/비밀번호로 바로 로그인해 보실 수 있습니다.');
-            document.getElementById('login-id').value = id;
-            document.getElementById('signup-id').value = '';
-            document.getElementById('signup-pw').value = '';
-            document.getElementById('signup-name').value = '';
-            document.getElementById('signup-phone').value = '';
-            document.getElementById('signup-email').value = '';
-            switchAuthTab('login');
-        }
-
-        function submitLogin() {
-            const id = document.getElementById('login-id').value.trim();
-            const pw = document.getElementById('login-pw').value.trim();
-            if (!id || !pw) {
-                alert('아이디와 비밀번호를 입력해 주세요.');
-                return;
-            }
-
-            if (id === 'admin' && pw === 'admin1234') {
-                setCurrentUser({ id: 'admin', name: '관리자', role: 'admin' });
-                alert('관리자로 로그인되었습니다.');
-                closeAuthModal();
-                return;
-            }
-
-            const members = JSON.parse(localStorage.getItem('members') || '[]');
-            const found = members.find(function(m) { return m.id === id && m.pw === pw; });
-            if (!found) {
-                alert('아이디 또는 비밀번호가 올바르지 않습니다.');
-                return;
-            }
-            setCurrentUser({ id: found.id, name: found.name, role: 'member' });
-            alert(found.name + '님, 환영합니다.');
-            closeAuthModal();
-        }
-
-        function googleLoginDemo() {
-            alert('데모 버전입니다. 실제 서비스에서는 Google 팝업 로그인(signInWithPopup)이 연결되어 팝업창에서 바로 인증을 완료합니다.');
-        }
-
-        function setCurrentUser(user) {
-            localStorage.setItem('current_user', JSON.stringify(user));
-            document.getElementById('login-id').value = '';
-            document.getElementById('login-pw').value = '';
-            afterAuthChange();
-        }
-
-        function logout() {
-            localStorage.removeItem('current_user');
-            afterAuthChange();
-        }
-
-        function afterAuthChange() {
-            updateAuthUI();
-            loadMealRecords();
-            checkUserProfile();
-            if (!document.getElementById('page-board').classList.contains('hidden')) renderBoard('board');
-            if (!document.getElementById('page-memberBoard').classList.contains('hidden')) renderBoard('mb');
-        }
-
-        function updateAuthUI() {
-            const cu = getCurrentUser();
-            const label = document.getElementById('auth-btn-label');
-            label.innerText = cu ? (cu.name + (cu.role === 'admin' ? ' (관리자) ▾' : ' ▾')) : '로그인';
-        }
-
-        /* =========================================================
-           소통창 / 회원소통창 게시판
-           * 실제 서비스에서는 아래 getPosts/savePosts를
-             Firebase Realtime DB 등에 대한 GET/POST 호출로 교체하세요.
-        ========================================================= */
-        const BOARD_PAGE_SIZE = 10;
-        const boardPage = { board: 1, mb: 1 };
-        const tempPhoto = { board: null, mb: null };
-        const likeLock = {};
-
-        function getPosts(key) {
-            const raw = localStorage.getItem('posts_' + key);
-            if (raw) return JSON.parse(raw);
-
-            const sample = (key === 'board') ? [
-                { id: 1, authorId: 'seed_1', author: '건강지킴이', time: '2026-07-28 09:12', content: '오늘 아침엔 소음인 체질에 맞는 삼계탕을 먹었어요! 속이 편안하네요.', photo: null, likes: 4, likedByMe: false,
-                  comments: [ { id: 101, authorId: 'seed_c1', author: '나물이', content: '저도 오늘 삼계탕 먹었어요 :)', time: '07-28 10:02' } ] },
-                { id: 2, authorId: 'seed_2', author: '나물이', time: '2026-07-27 18:40', content: '여름철엔 시원한 메밀냉면이 최고인 것 같아요. 다들 추천해요!', photo: null, likes: 2, likedByMe: false, comments: [] },
-                { id: 3, authorId: 'seed_3', author: '한다원지기', time: '2026-07-26 08:05', content: '무더운 절기엔 수분 보충이 중요합니다. 물을 자주 드세요 :)', photo: null, likes: 6, likedByMe: false, comments: [] }
-            ] : [
-                { id: 1, authorId: 'seed_m1', author: '회원A', time: '2026-07-29 21:03', content: '회원 전용 게시판 첫 글입니다! 다들 반가워요.', photo: null, likes: 3, likedByMe: false, comments: [] },
-                { id: 2, authorId: 'seed_m2', author: '회원B', time: '2026-07-28 11:22', content: '저는 태음인인데 버섯 불고기 추천받고 정말 만족했어요.', photo: null, likes: 1, likedByMe: false, comments: [] }
-            ];
-            localStorage.setItem('posts_' + key, JSON.stringify(sample));
-            return sample;
-        }
-
-        function savePosts(key, posts) {
-            localStorage.setItem('posts_' + key, JSON.stringify(posts));
-        }
-
-        function previewPhoto(input, key) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                tempPhoto[key] = e.target.result;
-                const preview = document.getElementById(key + '-photo-preview');
-                preview.src = e.target.result;
-                preview.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function updateBoardAuthorInputs() {
-            const cu = getCurrentUser();
-            ['board', 'mb'].forEach(function(key) {
-                const input = document.getElementById(key + '-author');
-                if (!input) return;
-                if (cu) {
-                    input.value = cu.name;
-                    input.disabled = true;
-                    input.placeholder = cu.name + ' (로그인됨)';
-                } else {
-                    input.disabled = false;
-                    input.value = '';
-                    input.placeholder = '이름(닉네임)';
-                }
-            });
-        }
-
-        function submitPost(key) {
-            const authorInput = document.getElementById(key + '-author');
-            const contentInput = document.getElementById(key + '-content');
-            const cu = getCurrentUser();
-            const author = cu ? cu.name : (authorInput.value.trim() || '익명');
-            const content = contentInput.value.trim();
-
-            if (!content) {
-                alert('내용을 입력해 주세요.');
-                return;
-            }
-
-            const posts = getPosts(key);
-            const now = new Date();
-            const timeStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0')
-                + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
-            posts.unshift({
-                id: Date.now(),
-                authorId: getAuthorId(),
-                author: author,
-                time: timeStr,
-                content: content,
-                photo: tempPhoto[key],
-                likes: 0,
-                likedByMe: false,
-                comments: []
-            });
-            savePosts(key, posts);
-
-            contentInput.value = '';
-            if (!cu) authorInput.value = '';
-            tempPhoto[key] = null;
-            const preview = document.getElementById(key + '-photo-preview');
-            preview.classList.add('hidden');
-            preview.src = '';
-            document.getElementById(key + '-photo').value = '';
-
-            boardPage[key] = 1;
-            renderBoard(key);
-        }
-
-        function deletePost(key, id) {
-            const posts = getPosts(key);
-            const post = posts.find(function(p) { return p.id === id; });
-            if (!post) return;
-            if (!isAdmin() && post.authorId !== getAuthorId()) {
-                alert('본인이 작성한 글만 삭제할 수 있습니다.');
-                return;
-            }
-            if (!confirm('이 글을 삭제하시겠습니까?')) return;
-
-            savePosts(key, posts.filter(function(p) { return p.id !== id; }));
-            renderBoard(key);
-        }
-
-        function addComment(key, postId) {
-            const input = document.getElementById('comment-input-' + key + '-' + postId);
-            if (!input) return;
-            const content = input.value.trim();
-            if (!content) return;
-
-            const posts = getPosts(key);
-            const post = posts.find(function(p) { return p.id === postId; });
-            if (!post) return;
-            if (!post.comments) post.comments = [];
-
-            const cu = getCurrentUser();
-            const now = new Date();
-            const timeStr = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0')
-                + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
-            post.comments.push({
-                id: Date.now(),
-                authorId: getAuthorId(),
-                author: cu ? cu.name : '익명',
-                content: content,
-                time: timeStr
-            });
-            savePosts(key, posts);
-            renderBoard(key);
-        }
-
-        function deleteComment(key, postId, commentId) {
-            const posts = getPosts(key);
-            const post = posts.find(function(p) { return p.id === postId; });
-            if (!post || !post.comments) return;
-            const comment = post.comments.find(function(c) { return c.id === commentId; });
-            if (!comment) return;
-            if (!isAdmin() && comment.authorId !== getAuthorId()) {
-                alert('본인이 작성한 댓글만 삭제할 수 있습니다.');
-                return;
-            }
-            if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
-
-            post.comments = post.comments.filter(function(c) { return c.id !== commentId; });
-            savePosts(key, posts);
-            renderBoard(key);
-        }
-
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.innerText = str;
-            return div.innerHTML;
-        }
-
-        function renderBoard(key) {
-            updateBoardAuthorInputs();
-
-            const listEl = document.getElementById(key + '-list');
-            const pagEl = document.getElementById(key + '-pagination');
-            const posts = getPosts(key);
-            listEl.innerHTML = '';
-
-            const totalPages = Math.max(1, Math.ceil(posts.length / BOARD_PAGE_SIZE));
-            if (boardPage[key] > totalPages) boardPage[key] = totalPages;
-            const start = (boardPage[key] - 1) * BOARD_PAGE_SIZE;
-            const pagePosts = posts.slice(start, start + BOARD_PAGE_SIZE);
-
-            if (pagePosts.length === 0) {
-                listEl.innerHTML = '<p class="text-center text-xs text-stone-400 py-6">아직 등록된 글이 없습니다. 첫 글을 남겨보세요!</p>';
-            }
-
-            pagePosts.forEach(function(post) {
-                const canDeletePost = isAdmin() || post.authorId === getAuthorId();
-                const comments = post.comments || [];
-
-                const commentsHtml = comments.map(function(c) {
-                    const canDeleteComment = isAdmin() || c.authorId === getAuthorId();
-                    return `
-                        <div class="flex items-start justify-between gap-2 py-1.5 border-b border-stone-50 last:border-b-0">
-                            <div class="text-[11px] leading-relaxed">
-                                <span class="font-bold text-stone-700">${escapeHtml(c.author)}</span>
-                                <span class="text-stone-400 ml-1">${c.time}</span>
-                                <p class="text-stone-600">${escapeHtml(c.content)}</p>
-                            </div>
-                            ${canDeleteComment ? `<button onclick="deleteComment('${key}', ${post.id}, ${c.id})" class="text-stone-300 hover:text-rose-600 transition-colors flex-shrink-0" title="댓글 삭제"><i class="fa-solid fa-trash-can text-[10px]"></i></button>` : ''}
-                        </div>
-                    `;
-                }).join('');
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl border border-stone-200/80 shadow-lg p-4 space-y-2.5";
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-stone-800"><i class="fa-solid fa-circle-user text-emerald-800 mr-1"></i>${escapeHtml(post.author)}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] text-stone-400">${post.time}</span>
-                            ${canDeletePost ? `<button onclick="deletePost('${key}', ${post.id})" class="text-stone-300 hover:text-rose-600 transition-colors" title="글 삭제"><i class="fa-solid fa-trash-can text-[11px]"></i></button>` : ''}
-                        </div>
-                    </div>
-                    <p class="text-xs text-stone-700 leading-relaxed whitespace-pre-line">${escapeHtml(post.content)}</p>
-                    ${post.photo ? `<img src="${post.photo}" class="w-full max-h-56 object-cover rounded-xl border border-stone-100">` : ''}
-                    <div class="flex items-center justify-between pt-2 border-t border-stone-100">
-                        <button class="flex items-center gap-1.5 text-xs font-bold ${post.likedByMe ? 'text-rose-600' : 'text-stone-400'} transition-colors" ${post.likedByMe ? 'disabled' : ''} onclick="toggleLike('${key}', ${post.id}, this)">
-                            <i class="fa-solid fa-heart"></i><span>${post.likes}</span>
-                        </button>
-                        <span class="liked-msg text-[10px] text-rose-600 font-bold opacity-0 transition-opacity">눌렀어요</span>
-                    </div>
-                    <div class="pt-2 border-t border-stone-100 space-y-1">
-                        ${commentsHtml || '<p class="text-[11px] text-stone-300 py-1">아직 댓글이 없습니다.</p>'}
-                    </div>
-                    <div class="flex items-center gap-1.5 pt-1">
-                        <input type="text" id="comment-input-${key}-${post.id}" placeholder="댓글을 입력하세요" class="flex-grow p-2 rounded-lg border border-stone-200 bg-stone-50/50 text-[11px] focus:outline-emerald-800 focus:bg-white transition-all" onkeydown="if(event.key==='Enter'){addComment('${key}', ${post.id});}">
-                        <button onclick="addComment('${key}', ${post.id})" class="bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold px-3 py-2 rounded-lg text-[11px] transition-colors">등록</button>
-                    </div>
-                `;
-                listEl.appendChild(card);
-            });
-
-            pagEl.innerHTML = '';
-            if (totalPages > 1) {
-                for (let i = 1; i <= totalPages; i++) {
-                    const btn = document.createElement('button');
-                    btn.innerText = i;
-                    btn.className = "w-7 h-7 rounded-full text-xs font-bold transition-colors " + (i === boardPage[key] ? "bg-emerald-800 text-white" : "bg-stone-100 text-stone-600 hover:bg-stone-200");
-                    btn.onclick = (function(pageNum) {
-                        return function() { boardPage[key] = pageNum; renderBoard(key); };
-                    })(i);
-                    pagEl.appendChild(btn);
-                }
-            }
-        }
-
-        function toggleLike(key, id, btnEl) {
-            const lockKey = key + '_' + id;
-            if (likeLock[lockKey]) return; // 같은 버튼 연속 클릭 방지
-            likeLock[lockKey] = true;
-
-            const posts = getPosts(key);
-            const post = posts.find(function(p) { return p.id === id; });
-            if (!post || post.likedByMe) { likeLock[lockKey] = false; return; }
-
-            post.likes += 1;
-            post.likedByMe = true;
-            savePosts(key, posts);
-
-            btnEl.classList.remove('text-stone-400');
-            btnEl.classList.add('text-rose-600');
-            btnEl.disabled = true;
-            btnEl.querySelector('span').innerText = post.likes;
-
-            const msg = btnEl.parentElement.querySelector('.liked-msg');
-            msg.classList.remove('opacity-0');
-            setTimeout(function() { msg.classList.add('opacity-0'); }, 1200);
-
-            setTimeout(function() { likeLock[lockKey] = false; }, 500);
-        }
 
         function captureEnvironment() {
             const now = new Date();
@@ -1187,15 +785,11 @@
             }
         }
 
-        function getMealStorageKey() {
-            return 'sasang_meal_history_' + getAuthorId();
-        }
-
-        function saveMealRecords() {
-            localStorage.setItem(getMealStorageKey(), JSON.stringify(mealRecords));
-        }
-
         function addMealRecord() {
+            if (!window.__firebaseReady) {
+                alert('초기화 중입니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
             const date = document.getElementById('meal-date').value;
             const type = document.getElementById('meal-type').value;
             const name = document.getElementById('meal-name').value.trim();
@@ -1205,30 +799,8 @@
                 return;
             }
 
-            const now = new Date();
-            const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
-            const newRecord = {
-                id: Date.now(),
-                date: date,
-                time: timeStr,
-                recordedAt: now.toISOString(),
-                type: type,
-                name: name
-            };
-
-            mealRecords.push(newRecord);
-            saveMealRecords();
+            window.fbAddMealRecord({ date: date, type: type, name: name });
             document.getElementById('meal-name').value = '';
-            
-            renderMealHistory();
-            const profile = JSON.parse(localStorage.getItem('sasang_user_profile'));
-            if (profile) renderDashboard(profile);
-        }
-
-        function loadMealRecords() {
-            const savedRecords = localStorage.getItem(getMealStorageKey());
-            mealRecords = savedRecords ? JSON.parse(savedRecords) : [];
         }
 
         function renderMealHistory() {
@@ -1682,6 +1254,643 @@
             for(let i = 20; i < 30; i++) { if (answers[i] === type) score += 1.5; }
             return score;
         }
+    </script>
+
+    <!-- =========================================================
+         Firebase 연동 (Authentication + Firestore)
+         firebase-config.js 에 실제 프로젝트 설정값을 넣으면 동작합니다.
+         설정 방법은 README-firebase-setup.md 참고
+    ========================================================= -->
+    <script type="module">
+        import { firebaseConfig } from './firebase-config.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import {
+            getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword,
+            createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, signOut
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        import {
+            getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, addDoc,
+            collection, query, where, orderBy, onSnapshot, serverTimestamp, increment, arrayUnion
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        let app, auth, db;
+        window.__firebaseReady = false;
+
+        function isPlaceholderConfig() {
+            return !firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.indexOf('YOUR_') === 0;
+        }
+
+        let currentAuthUser = null;   // Firebase Auth User 객체
+        let currentMember = null;     // Firestore members/{uid} 캐시
+        const postsCache = { board: [], mb: [] };
+        const commentOpenState = {};
+        const boardPage = { board: 1, mb: 1 };
+        const BOARD_PAGE_SIZE = 10;
+        const tempPhoto = { board: null, mb: null };
+        let unsubMeal = null;
+        let allMembersCache = [];
+
+        function idToPseudoEmail(id) {
+            // Firebase Authentication의 이메일/비밀번호 로그인은 실제 이메일 형식이 필요하므로,
+            // 사용자가 입력한 "아이디"를 내부적으로만 쓰는 가짜 이메일로 변환해서 사용합니다.
+            return id.trim().toLowerCase() + '@handawon.local';
+        }
+
+        function getCurrentUserSafe() {
+            return (currentAuthUser && !currentAuthUser.isAnonymous && currentMember) ? currentMember : null;
+        }
+
+        function isApprovedMember() {
+            return !!(currentMember && (currentMember.status === 'approved' || currentMember.role === 'admin'));
+        }
+
+        function checkReady() {
+            if (!window.__firebaseReady) {
+                alert('Firebase 프로젝트 설정이 아직 완료되지 않았습니다.\nfirebase-config.js 파일에 실제 프로젝트 설정값을 입력해주세요. (README-firebase-setup.md 참고)');
+                return false;
+            }
+            return true;
+        }
+
+        function friendlyAuthError(e) {
+            const code = (e && e.code) || '';
+            if (code.indexOf('email-already-in-use') >= 0) return '이미 사용 중인 아이디입니다.';
+            if (code.indexOf('wrong-password') >= 0 || code.indexOf('invalid-credential') >= 0) return '아이디 또는 비밀번호가 올바르지 않습니다.';
+            if (code.indexOf('user-not-found') >= 0) return '존재하지 않는 아이디입니다.';
+            if (code.indexOf('weak-password') >= 0) return '비밀번호는 6자 이상이어야 합니다.';
+            if (code.indexOf('popup-closed-by-user') >= 0) return 'Google 로그인 창이 닫혔습니다.';
+            console.error(e);
+            return 'Firebase 연동 오류가 발생했습니다: ' + code;
+        }
+
+        function formatNow() {
+            const now = new Date();
+            return String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0')
+                + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        }
+
+        function formatDateTime(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
+                + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.innerText = str == null ? '' : str;
+            return div.innerHTML;
+        }
+
+        /* ================== 인증 (로그인 / 회원가입 / Google) ================== */
+        window.getCurrentUser = function () {
+            const cu = getCurrentUserSafe();
+            if (!cu) return null;
+            return { uid: currentAuthUser.uid, name: cu.name, role: cu.role, status: cu.status };
+        };
+
+        window.getAuthorId = function () {
+            return currentAuthUser ? currentAuthUser.uid : null;
+        };
+
+        window.isAdmin = function () {
+            return !!(currentMember && currentMember.role === 'admin');
+        };
+
+        window.openAuthModal = function () {
+            if (getCurrentUserSafe()) {
+                if (confirm(currentMember.name + '님으로 로그인되어 있습니다. 로그아웃 하시겠습니까?')) {
+                    window.logout();
+                }
+                return;
+            }
+            document.getElementById('auth-modal').classList.remove('hidden');
+            window.switchAuthTab('login');
+        };
+
+        window.closeAuthModal = function () {
+            document.getElementById('auth-modal').classList.add('hidden');
+        };
+
+        window.closeAuthModalOutside = function (e) {
+            if (e.target.id === 'auth-modal') window.closeAuthModal();
+        };
+
+        window.switchAuthTab = function (tab) {
+            const loginTab = document.getElementById('tab-login');
+            const signupTab = document.getElementById('tab-signup');
+            const loginForm = document.getElementById('auth-login');
+            const signupForm = document.getElementById('auth-signup');
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden'); signupForm.classList.add('hidden');
+                loginTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-emerald-800 text-white transition-colors";
+                signupTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-stone-100 text-stone-500 transition-colors";
+            } else {
+                signupForm.classList.remove('hidden'); loginForm.classList.add('hidden');
+                signupTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-emerald-800 text-white transition-colors";
+                loginTab.className = "flex-1 text-xs font-bold py-2 rounded-lg bg-stone-100 text-stone-500 transition-colors";
+            }
+        };
+
+        window.submitSignup = async function () {
+            if (!checkReady()) return;
+            const id = document.getElementById('signup-id').value.trim();
+            const pw = document.getElementById('signup-pw').value.trim();
+            const name = document.getElementById('signup-name').value.trim();
+            const phone = document.getElementById('signup-phone').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+
+            if (!id || !pw || !name || !phone || !email) { alert('모든 항목을 입력해 주세요.'); return; }
+            if (!/^[a-zA-Z0-9]{4,}$/.test(id)) { alert('아이디는 영문/숫자 4자 이상으로 입력해 주세요.'); return; }
+            if (pw.length < 6) { alert('비밀번호는 6자 이상이어야 합니다.'); return; }
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, idToPseudoEmail(id), pw);
+                await updateProfile(cred.user, { displayName: name });
+                await setDoc(doc(db, 'members', cred.user.uid), {
+                    loginId: id, name: name, phone: phone, email: email,
+                    role: 'member', status: 'pending', provider: 'password',
+                    createdAt: serverTimestamp()
+                });
+                alert('회원가입 신청이 완료되었습니다. 관리자 승인 후 회원소통창 등 회원 전용 기능을 이용하실 수 있습니다.');
+                window.switchAuthTab('login');
+                document.getElementById('login-id').value = id;
+                document.getElementById('signup-id').value = '';
+                document.getElementById('signup-pw').value = '';
+                document.getElementById('signup-name').value = '';
+                document.getElementById('signup-phone').value = '';
+                document.getElementById('signup-email').value = '';
+            } catch (e) {
+                alert(friendlyAuthError(e));
+            }
+        };
+
+        window.submitLogin = async function () {
+            if (!checkReady()) return;
+            const id = document.getElementById('login-id').value.trim();
+            const pw = document.getElementById('login-pw').value.trim();
+            if (!id || !pw) { alert('아이디와 비밀번호를 입력해 주세요.'); return; }
+            try {
+                await signInWithEmailAndPassword(auth, idToPseudoEmail(id), pw);
+                document.getElementById('login-id').value = '';
+                document.getElementById('login-pw').value = '';
+                window.closeAuthModal();
+            } catch (e) {
+                alert(friendlyAuthError(e));
+            }
+        };
+
+        window.googleLogin = async function () {
+            if (!checkReady()) return;
+            try {
+                await signInWithPopup(auth, new GoogleAuthProvider());
+                window.closeAuthModal();
+            } catch (e) {
+                alert(friendlyAuthError(e));
+            }
+        };
+
+        window.logout = async function () {
+            await signOut(auth);
+            // onAuthStateChanged가 자동으로 다시 익명(게스트) 로그인으로 전환합니다.
+        };
+
+        window.updateAuthUI = function () {
+            const label = document.getElementById('auth-btn-label');
+            const cu = getCurrentUserSafe();
+            if (cu) {
+                label.innerText = cu.name + (cu.role === 'admin' ? ' (관리자) ▾' : cu.status === 'pending' ? ' (승인대기) ▾' : ' ▾');
+            } else {
+                label.innerText = '로그인';
+            }
+            const adminBtns = [document.getElementById('admin-menu-btn-desktop'), document.getElementById('admin-menu-btn-mobile')];
+            adminBtns.forEach(function (btn) { if (btn) btn.classList.toggle('hidden', !window.isAdmin()); });
+            updateBoardAuthorLabelsOnly();
+        };
+
+        function updateBoardAuthorLabelsOnly() {
+            const cu = getCurrentUserSafe();
+            ['board', 'mb'].forEach(function (key) {
+                const input = document.getElementById(key + '-author');
+                if (!input) return;
+                if (cu) {
+                    input.value = cu.name;
+                    input.disabled = true;
+                    input.placeholder = cu.name + ' (로그인됨)';
+                } else {
+                    input.disabled = false;
+                    input.placeholder = '이름(닉네임)';
+                }
+            });
+        }
+
+        /* ================== 게시판 (소통창 / 회원소통창) ================== */
+        window.previewPhoto = function (input, key) {
+            const file = input.files[0];
+            if (!file) return;
+            if (file.size > 500 * 1024) {
+                alert('사진 용량이 너무 큽니다. 500KB 이하의 이미지를 사용해 주세요.');
+                input.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                tempPhoto[key] = e.target.result;
+                const preview = document.getElementById(key + '-photo-preview');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.submitPost = async function (key) {
+            if (!checkReady()) return;
+            if (key === 'mb' && !isApprovedMember()) {
+                alert('회원소통창은 승인된 회원만 글을 작성할 수 있습니다.');
+                return;
+            }
+            const contentInput = document.getElementById(key + '-content');
+            const authorInput = document.getElementById(key + '-author');
+            const cu = getCurrentUserSafe();
+            const author = cu ? cu.name : (authorInput.value.trim() || '익명');
+            const content = contentInput.value.trim();
+            if (!content) { alert('내용을 입력해 주세요.'); return; }
+
+            try {
+                await addDoc(collection(db, 'posts'), {
+                    board: key,
+                    authorId: window.getAuthorId(),
+                    author: author,
+                    content: content,
+                    photo: tempPhoto[key] || null,
+                    likes: 0,
+                    likedBy: [],
+                    comments: [],
+                    createdAt: serverTimestamp()
+                });
+                contentInput.value = '';
+                if (!cu) authorInput.value = '';
+                tempPhoto[key] = null;
+                document.getElementById(key + '-photo-preview').classList.add('hidden');
+                document.getElementById(key + '-photo').value = '';
+            } catch (e) {
+                console.error(e);
+                alert('글 등록에 실패했습니다: ' + (e.code || e.message));
+            }
+        };
+
+        window.deletePost = async function (key, id) {
+            const post = (postsCache[key] || []).find(function (p) { return p.id === id; });
+            if (!post) return;
+            if (!window.isAdmin() && post.authorId !== window.getAuthorId()) {
+                alert('본인이 작성한 글만 삭제할 수 있습니다.');
+                return;
+            }
+            if (!confirm('이 글을 삭제하시겠습니까?')) return;
+            try {
+                await deleteDoc(doc(db, 'posts', id));
+            } catch (e) {
+                alert('삭제 실패: ' + (e.code || e.message));
+            }
+        };
+
+        window.toggleLike = async function (key, id) {
+            const post = (postsCache[key] || []).find(function (p) { return p.id === id; });
+            if (!post) return;
+            const uid = window.getAuthorId();
+            if (!uid || (post.likedBy || []).indexOf(uid) >= 0) return;
+            try {
+                await updateDoc(doc(db, 'posts', id), { likes: increment(1), likedBy: arrayUnion(uid) });
+                const btnEl = document.querySelector('[data-like-btn="' + key + '-' + id + '"]');
+                if (btnEl) {
+                    const msg = btnEl.parentElement.querySelector('.liked-msg');
+                    if (msg) {
+                        msg.classList.remove('opacity-0');
+                        setTimeout(function () { msg.classList.add('opacity-0'); }, 1200);
+                    }
+                }
+            } catch (e) {
+                alert('좋아요 실패: ' + (e.code || e.message));
+            }
+        };
+
+        window.toggleComments = function (key, postId) {
+            const stateKey = key + '_' + postId;
+            commentOpenState[stateKey] = !commentOpenState[stateKey];
+            const el = document.getElementById('comment-section-' + key + '-' + postId);
+            if (el) el.classList.toggle('hidden', !commentOpenState[stateKey]);
+        };
+
+        window.addComment = async function (key, postId) {
+            if (!checkReady()) return;
+            const input = document.getElementById('comment-input-' + key + '-' + postId);
+            if (!input) return;
+            const content = input.value.trim();
+            if (!content) return;
+
+            const post = (postsCache[key] || []).find(function (p) { return p.id === postId; });
+            if (!post) return;
+            const cu = getCurrentUserSafe();
+            const newComment = {
+                id: 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                authorId: window.getAuthorId(),
+                author: cu ? cu.name : '익명',
+                content: content,
+                time: formatNow()
+            };
+            const updated = (post.comments || []).concat([newComment]);
+            try {
+                await updateDoc(doc(db, 'posts', postId), { comments: updated });
+                input.value = '';
+            } catch (e) {
+                alert('댓글 등록 실패: ' + (e.code || e.message));
+            }
+        };
+
+        window.deleteComment = async function (key, postId, commentId) {
+            const post = (postsCache[key] || []).find(function (p) { return p.id === postId; });
+            if (!post) return;
+            const comment = (post.comments || []).find(function (c) { return c.id === commentId; });
+            if (!comment) return;
+            if (!window.isAdmin() && comment.authorId !== window.getAuthorId()) {
+                alert('본인이 작성한 댓글만 삭제할 수 있습니다.');
+                return;
+            }
+            if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
+            const updated = (post.comments || []).filter(function (c) { return c.id !== commentId; });
+            try {
+                await updateDoc(doc(db, 'posts', postId), { comments: updated });
+            } catch (e) {
+                alert('댓글 삭제 실패: ' + (e.code || e.message));
+            }
+        };
+
+        window.renderBoard = function (key) {
+            updateBoardAuthorLabelsOnly();
+            const listEl = document.getElementById(key + '-list');
+            const pagEl = document.getElementById(key + '-pagination');
+            if (!listEl || !pagEl) return;
+
+            if (!window.__firebaseReady) {
+                listEl.innerHTML = '<p class="text-center text-xs text-amber-600 py-6">Firebase 설정이 완료되면 게시글이 표시됩니다.<br>(firebase-config.js를 확인해주세요)</p>';
+                pagEl.innerHTML = '';
+                return;
+            }
+            if (key === 'mb' && !isApprovedMember()) {
+                listEl.innerHTML = '<p class="text-center text-xs text-stone-400 py-6">승인된 회원만 열람할 수 있습니다.</p>';
+                pagEl.innerHTML = '';
+                return;
+            }
+
+            const posts = postsCache[key] || [];
+            listEl.innerHTML = '';
+            const totalPages = Math.max(1, Math.ceil(posts.length / BOARD_PAGE_SIZE));
+            if (boardPage[key] > totalPages) boardPage[key] = totalPages;
+            const start = (boardPage[key] - 1) * BOARD_PAGE_SIZE;
+            const pagePosts = posts.slice(start, start + BOARD_PAGE_SIZE);
+
+            if (pagePosts.length === 0) {
+                listEl.innerHTML = '<p class="text-center text-xs text-stone-400 py-6">아직 등록된 글이 없습니다. 첫 글을 남겨보세요!</p>';
+            }
+
+            const myUid = window.getAuthorId();
+            pagePosts.forEach(function (post) {
+                const canDeletePost = window.isAdmin() || post.authorId === myUid;
+                const comments = post.comments || [];
+                const isOpen = !!commentOpenState[key + '_' + post.id];
+                const likedByMe = (post.likedBy || []).indexOf(myUid) >= 0;
+
+                const commentsHtml = comments.map(function (c) {
+                    const canDeleteComment = window.isAdmin() || c.authorId === myUid;
+                    return '' +
+                        '<div class="flex items-start justify-between gap-2 py-1.5 border-b border-stone-50 last:border-b-0">' +
+                            '<div class="text-[11px] leading-relaxed">' +
+                                '<span class="font-bold text-stone-700">' + escapeHtml(c.author) + '</span>' +
+                                '<span class="text-stone-400 ml-1">' + c.time + '</span>' +
+                                '<p class="text-stone-600">' + escapeHtml(c.content) + '</p>' +
+                            '</div>' +
+                            (canDeleteComment ? ('<button onclick="deleteComment(\'' + key + '\', \'' + post.id + '\', \'' + c.id + '\')" class="text-stone-300 hover:text-rose-600 transition-colors flex-shrink-0" title="댓글 삭제"><i class="fa-solid fa-trash-can text-[10px]"></i></button>') : '') +
+                        '</div>';
+                }).join('');
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-stone-200/80 shadow-lg p-4 space-y-2.5";
+                card.innerHTML =
+                    '<div class="flex items-center justify-between">' +
+                        '<span class="text-xs font-bold text-stone-800"><i class="fa-solid fa-circle-user text-emerald-800 mr-1"></i>' + escapeHtml(post.author) + '</span>' +
+                        '<div class="flex items-center gap-2">' +
+                            '<span class="text-[10px] text-stone-400">' + (post.timeLabel || '') + '</span>' +
+                            (canDeletePost ? ('<button onclick="deletePost(\'' + key + '\', \'' + post.id + '\')" class="text-stone-300 hover:text-rose-600 transition-colors" title="글 삭제"><i class="fa-solid fa-trash-can text-[11px]"></i></button>') : '') +
+                        '</div>' +
+                    '</div>' +
+                    '<p class="text-xs text-stone-700 leading-relaxed whitespace-pre-line">' + escapeHtml(post.content) + '</p>' +
+                    (post.photo ? ('<img src="' + post.photo + '" class="w-full max-h-56 object-cover rounded-xl border border-stone-100">') : '') +
+                    '<div class="flex items-center justify-between pt-2 border-t border-stone-100">' +
+                        '<button data-like-btn="' + key + '-' + post.id + '" class="flex items-center gap-1.5 text-xs font-bold ' + (likedByMe ? 'text-rose-600' : 'text-stone-400') + ' transition-colors" ' + (likedByMe ? 'disabled' : '') + ' onclick="toggleLike(\'' + key + '\', \'' + post.id + '\')">' +
+                            '<i class="fa-solid fa-heart"></i><span>' + (post.likes || 0) + '</span>' +
+                        '</button>' +
+                        '<span class="liked-msg text-[10px] text-rose-600 font-bold opacity-0 transition-opacity">눌렀어요</span>' +
+                        '<button onclick="toggleComments(\'' + key + '\', \'' + post.id + '\')" class="flex items-center gap-1.5 text-xs font-bold text-stone-400 hover:text-emerald-800 transition-colors">' +
+                            '<i class="fa-regular fa-comment"></i><span>댓글 ' + comments.length + '</span>' +
+                        '</button>' +
+                    '</div>' +
+                    '<div id="comment-section-' + key + '-' + post.id + '" class="' + (isOpen ? '' : 'hidden') + ' pt-2 border-t border-stone-100 space-y-2">' +
+                        '<div class="space-y-1">' + (commentsHtml || '<p class="text-[11px] text-stone-300 py-1">아직 댓글이 없습니다.</p>') + '</div>' +
+                        '<div class="flex items-center gap-1.5">' +
+                            '<input type="text" id="comment-input-' + key + '-' + post.id + '" placeholder="댓글을 입력하세요" class="flex-grow p-2 rounded-lg border border-stone-200 bg-stone-50/50 text-[11px] focus:outline-emerald-800 focus:bg-white transition-all">' +
+                            '<button onclick="addComment(\'' + key + '\', \'' + post.id + '\')" class="bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold px-3 py-2 rounded-lg text-[11px] transition-colors">등록</button>' +
+                        '</div>' +
+                    '</div>';
+                listEl.appendChild(card);
+            });
+
+            pagEl.innerHTML = '';
+            if (totalPages > 1) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.innerText = i;
+                    btn.className = "w-7 h-7 rounded-full text-xs font-bold transition-colors " + (i === boardPage[key] ? "bg-emerald-800 text-white" : "bg-stone-100 text-stone-600 hover:bg-stone-200");
+                    btn.onclick = (function (pageNum) { return function () { boardPage[key] = pageNum; window.renderBoard(key); }; })(i);
+                    pagEl.appendChild(btn);
+                }
+            }
+        };
+
+        function subscribeBoard(key) {
+            const q = query(collection(db, 'posts'), where('board', '==', key), orderBy('createdAt', 'desc'));
+            onSnapshot(q, function (snap) {
+                postsCache[key] = snap.docs.map(function (d) {
+                    const data = d.data();
+                    const ts = (data.createdAt && data.createdAt.toDate) ? data.createdAt.toDate() : new Date();
+                    return Object.assign({ id: d.id, timeLabel: formatDateTime(ts) }, data);
+                });
+                const pageEl = document.getElementById(key === 'board' ? 'page-board' : 'page-memberBoard');
+                if (pageEl && !pageEl.classList.contains('hidden')) window.renderBoard(key);
+            }, function (err) {
+                console.error('게시판 구독 오류(' + key + '):', err);
+            });
+        }
+
+        /* ================== 식사 기록 ================== */
+        window.fbAddMealRecord = async function (record) {
+            const uid = window.getAuthorId();
+            if (!uid) { alert('로그인 준비 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+            try {
+                await addDoc(collection(db, 'members', uid, 'mealRecords'), {
+                    date: record.date,
+                    time: formatNow().split(' ')[1],
+                    type: record.type,
+                    name: record.name,
+                    createdAt: serverTimestamp()
+                });
+            } catch (e) {
+                alert('식사 기록 저장 실패: ' + (e.code || e.message));
+            }
+        };
+
+        function subscribeMealRecords(uid) {
+            if (unsubMeal) { unsubMeal(); unsubMeal = null; }
+            const q = query(collection(db, 'members', uid, 'mealRecords'), orderBy('createdAt', 'desc'));
+            unsubMeal = onSnapshot(q, function (snap) {
+                window.mealRecords = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+                if (window.renderMealHistory) window.renderMealHistory();
+                const profile = JSON.parse(localStorage.getItem('sasang_user_profile') || 'null');
+                if (profile && window.renderDashboard) window.renderDashboard(profile);
+            }, function (err) {
+                console.error('식사기록 구독 오류:', err);
+            });
+        }
+
+        /* ================== 방문자 수 ================== */
+        function subscribeVisitorCount() {
+            const today = new Date().toISOString().split('T')[0];
+            const ref = doc(db, 'stats', 'visits');
+            onSnapshot(ref, function (snap) {
+                const data = snap.exists() ? snap.data() : { total: 0, byDate: {} };
+                document.getElementById('visitor-today').innerText = (((data.byDate || {})[today]) || 0).toLocaleString();
+                document.getElementById('visitor-total').innerText = (data.total || 0).toLocaleString();
+            }, function (err) { console.error('방문자수 구독 오류:', err); });
+
+            if (!sessionStorage.getItem('visited_this_session')) {
+                sessionStorage.setItem('visited_this_session', '1');
+                const update = { total: increment(1) };
+                update['byDate.' + today] = increment(1);
+                setDoc(ref, update, { merge: true }).catch(function (e) { console.error('방문자수 증가 실패:', e); });
+            }
+        }
+
+        /* ================== 관리자 패널 ================== */
+        function subscribeMembersForAdmin() {
+            onSnapshot(collection(db, 'members'), function (snap) {
+                allMembersCache = snap.docs.map(function (d) { return Object.assign({ uid: d.id }, d.data()); });
+                const adminPage = document.getElementById('page-admin');
+                if (adminPage && !adminPage.classList.contains('hidden')) window.fbRenderAdmin();
+            }, function (err) { console.error('회원목록 구독 오류:', err); });
+        }
+
+        window.fbRenderAdmin = function () {
+            const pendingEl = document.getElementById('admin-pending-list');
+            const memberEl = document.getElementById('admin-member-list');
+            if (!window.isAdmin()) {
+                pendingEl.innerHTML = '<p class="text-[11px] text-rose-500">관리자만 접근할 수 있습니다.</p>';
+                memberEl.innerHTML = '';
+                return;
+            }
+
+            const pending = allMembersCache.filter(function (m) { return m.status === 'pending'; });
+            const approved = allMembersCache.filter(function (m) { return m.status !== 'pending'; });
+
+            pendingEl.innerHTML = pending.length ? pending.map(function (m) {
+                return '<div class="flex items-center justify-between bg-stone-50 rounded-xl p-2.5">' +
+                    '<div class="text-[11px]"><p class="font-bold text-stone-800">' + escapeHtml(m.name) + ' <span class="text-stone-400 font-normal">(' + escapeHtml(m.loginId) + ')</span></p>' +
+                    '<p class="text-stone-400">' + escapeHtml(m.phone) + ' · ' + escapeHtml(m.email) + '</p></div>' +
+                    '<div class="flex gap-1">' +
+                        '<button onclick="approveMember(\'' + m.uid + '\')" class="bg-emerald-800 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg">승인</button>' +
+                        '<button onclick="rejectMember(\'' + m.uid + '\')" class="bg-stone-200 text-stone-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg">거절</button>' +
+                    '</div></div>';
+            }).join('') : '<p class="text-[11px] text-stone-400">승인 대기 중인 회원이 없습니다.</p>';
+
+            memberEl.innerHTML = approved.length ? approved.map(function (m) {
+                return '<div class="flex items-center justify-between bg-stone-50 rounded-xl p-2.5">' +
+                    '<div class="text-[11px]"><p class="font-bold text-stone-800">' + escapeHtml(m.name) + ' <span class="text-stone-400 font-normal">(' + escapeHtml(m.loginId) + ')</span>' + (m.role === 'admin' ? ' <span class="text-amber-600 font-bold">· 관리자</span>' : '') + '</p>' +
+                    '<p class="text-stone-400">' + escapeHtml(m.phone) + ' · ' + escapeHtml(m.email) + '</p></div>' +
+                    (m.role !== 'admin' ? ('<button onclick="removeMember(\'' + m.uid + '\')" class="bg-rose-600 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg">강제 탈퇴</button>') : '') +
+                    '</div>';
+            }).join('') : '<p class="text-[11px] text-stone-400">등록된 회원이 없습니다.</p>';
+        };
+
+        window.approveMember = async function (uid) {
+            try { await updateDoc(doc(db, 'members', uid), { status: 'approved' }); }
+            catch (e) { alert('승인 실패: ' + (e.code || e.message)); }
+        };
+        window.rejectMember = async function (uid) {
+            if (!confirm('가입 신청을 거절하시겠습니까?')) return;
+            try { await deleteDoc(doc(db, 'members', uid)); }
+            catch (e) { alert('거절 실패: ' + (e.code || e.message)); }
+        };
+        window.removeMember = async function (uid) {
+            if (!confirm('이 회원을 강제 탈퇴시키겠습니까?\n(회원 자격만 박탈되며, 로그인 계정 자체 삭제는 서버 측 작업이 별도로 필요합니다)')) return;
+            try { await deleteDoc(doc(db, 'members', uid)); }
+            catch (e) { alert('탈퇴 처리 실패: ' + (e.code || e.message)); }
+        };
+
+        /* ================== 초기화 ================== */
+        async function init() {
+            if (isPlaceholderConfig()) {
+                console.warn('firebase-config.js에 실제 Firebase 프로젝트 설정값을 입력해주세요. (README-firebase-setup.md 참고)');
+                window.__firebaseReady = false;
+                window.updateAuthUI();
+                ['board', 'mb'].forEach(function (key) { window.renderBoard(key); });
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                window.__firebaseReady = true;
+            } catch (e) {
+                console.error('Firebase 초기화 실패:', e);
+                window.__firebaseReady = false;
+                window.updateAuthUI();
+                ['board', 'mb'].forEach(function (key) { window.renderBoard(key); });
+                return;
+            }
+
+            onAuthStateChanged(auth, async function (user) {
+                if (!user) {
+                    try { await signInAnonymously(auth); } catch (e) { console.error('익명 로그인 실패:', e); }
+                    return;
+                }
+                currentAuthUser = user;
+
+                if (!user.isAnonymous) {
+                    let memberSnap = await getDoc(doc(db, 'members', user.uid));
+                    if (!memberSnap.exists() && user.providerData.some(function (p) { return p.providerId === 'google.com'; })) {
+                        await setDoc(doc(db, 'members', user.uid), {
+                            loginId: user.email, name: user.displayName || '구글회원',
+                            phone: '', email: user.email,
+                            role: 'member', status: 'pending', provider: 'google',
+                            createdAt: serverTimestamp()
+                        });
+                        memberSnap = await getDoc(doc(db, 'members', user.uid));
+                    }
+                    currentMember = memberSnap.exists() ? memberSnap.data() : null;
+                    subscribeMealRecords(user.uid);
+                    if (window.isAdmin()) subscribeMembersForAdmin();
+                } else {
+                    currentMember = null;
+                    subscribeMealRecords(user.uid); // 비회원(익명)도 자신의 식사기록은 남길 수 있음
+                }
+
+                window.updateAuthUI();
+                if (window.checkUserProfile) window.checkUserProfile();
+            });
+
+            subscribeBoard('board');
+            subscribeBoard('mb');
+            subscribeVisitorCount();
+        }
+
+        init();
     </script>
 </body>
 </html>
