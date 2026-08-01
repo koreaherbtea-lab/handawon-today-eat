@@ -6,10 +6,46 @@
     <title>사상체질(四象體質) 정밀 종합 양생 가이드</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
+    <script>
+        // 브랜드 컬러 재정의 (기존 emerald/amber/rose/cyan/stone 클래스 이름은 그대로 두고,
+        // 실제 색상값만 20~30대 직장인 취향의 모던한 팔레트로 교체합니다)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: { // 브랜드 메인 컬러 (모던 포레스트 틸)
+                            50:  '#EFF7F4', 100: '#DCEEE7', 200: '#BADDD1', 300: '#8FC7B5',
+                            400: '#5FAB94', 500: '#3D8F76', 600: '#2C7660', 700: '#24614E',
+                            800: '#1E4F40', 900: '#16382E', 950: '#0D2019'
+                        },
+                        amber: { // 보조 포인트 컬러 (코랄/애프리콧)
+                            50:  '#FFF4F0', 100: '#FFE4DA', 200: '#FFC7B3', 300: '#FFA687',
+                            400: '#FF8760', 500: '#FF6B40', 600: '#F3552A', 700: '#D8431E',
+                            800: '#B23517', 900: '#7A2410'
+                        },
+                        rose: { // 경고/삭제 컬러
+                            50: '#FDEEED', 500: '#E8574A', 600: '#DA4234', 700: '#B93225'
+                        },
+                        cyan: { // 배달/보조 강조 컬러 (모던 블루)
+                            50: '#EEF3FF', 200: '#C7D7FF', 600: '#3D63F0', 800: '#22409C', 950: '#10204F'
+                        },
+                        stone: { // 뉴트럴 그레이 (덜 탁하고 깔끔하게)
+                            50: '#FAFAF9', 100: '#F2F1EF', 200: '#E4E2DE', 300: '#CFCCC6',
+                            400: '#A6A29A', 500: '#83807A', 600: '#63605A', 700: '#4A4844',
+                            800: '#34322F', 900: '#201F1C'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Pretendard: 국내 스타트업/앱에서 가장 널리 쓰이는 모던 산세리프 (Toss, 당근마켓 등) -->
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <!-- Google Fonts (Pretendard 로드 실패 시 대체용) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght=400;700&family=Noto+Sans+KR:wght=300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -20,11 +56,14 @@
         html.fs-large { font-size: 137.5%; }
 
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f7f5f0;
+            font-family: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;
+            background-color: #FAFAF9;
+            letter-spacing: -0.01em;
         }
         .font-traditional {
-            font-family: 'Gowun Batang', serif;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
         .option-card {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -43,9 +82,6 @@
 
         html, body {
             margin: 0;
-        }
-        body {
-            background-color: #f7f5f0;
         }
         #app-frame {
             min-height: 100vh;
