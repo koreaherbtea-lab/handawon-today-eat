@@ -41,37 +41,16 @@
         html.fs-large .text-\[10px\] { font-size: 14px !important; }
         html.fs-large .text-\[11px\] { font-size: 15px !important; }
 
-        /* PC(16:9) / 모바일(9:16) 반응형 화면 비율 프레임 */
         html, body {
             margin: 0;
-            height: 100%;
         }
         body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #d6d3cc;
-        }
-        #app-frame {
-            position: relative;
             background-color: #f7f5f0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
         }
-        /* 모바일 기본: 9:16 세로 비율 */
         #app-frame {
-            width: min(100vw, 56.25vh);
-            height: min(177.78vw, 100vh);
-            max-height: 100vh;
-        }
-        /* PC(가로 폭 768px 이상): 16:9 가로 비율 */
-        @media (min-width: 768px) {
-            #app-frame {
-                width: min(96vw, 170.67vh);
-                height: min(54vw, 96vh);
-                aspect-ratio: 16 / 9;
-            }
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
@@ -90,9 +69,7 @@
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <span class="hidden text-xs font-bold text-emerald-900 font-traditional tracking-tighter" style="display:none;">한다원</span>
                 </div>
-                <p class="text-xs sm:text-sm font-bold text-emerald-950 font-traditional tracking-wide text-right flex-grow">
-                    "내 몸에 맞는 한 끼, 내일의 건강이 됩니다"
-                </p>
+                <div class="flex-grow"></div>
                 <div id="fs-toggle" class="flex-shrink-0 flex items-center gap-0.5 bg-stone-100 rounded-full p-0.5">
                     <button id="fs-btn-small" onclick="setFontSize('small')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">작게</button>
                     <button id="fs-btn-medium" onclick="setFontSize('medium')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">보통</button>
@@ -202,6 +179,23 @@
 
         <!-- [1] 정기 사용자 개인화 메인 대시보드 화면 -->
         <div id="main-dashboard" class="hidden space-y-4">
+
+            <!-- 종합 약선 추천식사 TOP5 중 1·2순위 하이라이트 -->
+            <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 rounded-2xl shadow-xl p-4 text-white">
+                <h4 class="text-[11px] font-bold text-emerald-200 tracking-wider uppercase mb-2.5 flex items-center">
+                    <i class="fa-solid fa-crown text-amber-300 mr-1.5"></i> 오늘의 종합 약선 추천 BEST 2
+                </h4>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div class="bg-white/10 rounded-xl p-3">
+                        <span class="text-[9px] font-bold text-amber-300">1순위 · 최적 약선</span>
+                        <p id="dash-top1-name" class="text-sm font-bold mt-0.5 leading-snug">-</p>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-3">
+                        <span class="text-[9px] font-bold text-emerald-200">2순위 · 추천 약선</span>
+                        <p id="dash-top2-name" class="text-sm font-bold mt-0.5 leading-snug">-</p>
+                    </div>
+                </div>
+            </div>
             
             <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 flex flex-col space-y-3">
                 <div class="flex items-center justify-between border-b border-stone-100 pb-2">
@@ -261,6 +255,17 @@
                     <span class="text-[9px] bg-cyan-50 text-cyan-800 border border-cyan-200 px-1.5 py-0.2 rounded font-bold">배민/요기요</span>
                 </div>
 
+                <!-- 비회원 안내 (회원만 이용 가능) -->
+                <div id="delivery-nonmember-notice" class="hidden text-center py-6">
+                    <i class="fa-solid fa-lock text-stone-300 text-2xl mb-2"></i>
+                    <p class="text-xs font-bold text-stone-700 mb-1">배달 앱 매칭 추천은 회원만 이용하실 수 있습니다</p>
+                    <p class="text-[11px] text-stone-500 mb-3">로그인 후 나의 위치 · 식사 기록을 반영한 배달 메뉴 추천을 받아보세요.</p>
+                    <button onclick="openAuthModal()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all active:scale-[0.99]">
+                        <i class="fa-solid fa-user mr-1"></i> 로그인 / 회원가입
+                    </button>
+                </div>
+
+                <div id="delivery-content">
                 <div class="grid grid-cols-4 gap-1 mb-3 bg-stone-100 p-1 rounded-xl text-[9px] sm:text-[10px] font-bold text-stone-600 text-center">
                     <button onclick="changeDeliveryTier('over30k')" id="tier-over30k" class="py-2 rounded-lg transition-all bg-white text-cyan-950 shadow-sm">3만원 이상</button>
                     <button onclick="changeDeliveryTier('between20k30k')" id="tier-between20k30k" class="py-2 rounded-lg transition-all hover:text-stone-900">2~3만원</button>
@@ -270,6 +275,7 @@
 
                 <div id="delivery-menu-container" class="space-y-2"></div>
                 <p id="dash-menu-reason" class="text-stone-600 text-xs leading-relaxed mt-3 bg-stone-50 p-2.5 rounded-xl border border-stone-200/40"></p>
+                </div><!-- /delivery-content -->
             </div>
 
             <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-amber-600">
@@ -362,6 +368,17 @@
 
         <!-- ============ [페이지: 식사기록] ============ -->
         <div id="page-meal" class="hidden space-y-4">
+            <!-- 비회원 안내 (회원만 이용 가능) -->
+            <div id="meal-nonmember-notice" class="hidden bg-white rounded-2xl border border-stone-200/80 shadow-xl p-6 text-center">
+                <i class="fa-solid fa-lock text-stone-300 text-3xl mb-3"></i>
+                <h4 class="text-sm font-bold text-stone-800 mb-1.5">식사기록은 회원만 이용하실 수 있습니다</h4>
+                <p class="text-xs text-stone-500 leading-relaxed mb-4">로그인 후 나만의 식사 기록을 남기고, 누적된 기록을 바탕으로 한 맞춤 건강 분석을 받아보세요.</p>
+                <button onclick="openAuthModal()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">
+                    <i class="fa-solid fa-user mr-1"></i> 로그인 / 회원가입
+                </button>
+            </div>
+
+            <div id="meal-content" class="space-y-4">
             <!-- [배치 1] 새로운 식사 기록 추가 -->
             <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
                 <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center">
@@ -372,10 +389,18 @@
                 </p>
                 
                 <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-3 gap-3">
                         <div>
                             <label class="block text-[10px] font-bold text-stone-600 mb-1">날짜</label>
                             <input type="date" id="meal-date" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-600 mb-1">시간대</label>
+                            <select id="meal-period" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                                <option value="breakfast">아침</option>
+                                <option value="lunch">점심</option>
+                                <option value="dinner">저녁</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-stone-600 mb-1">식사 유형</label>
@@ -420,13 +445,16 @@
                     <p class="text-xs text-stone-500">아직 등록된 식사 기록이 없습니다.</p>
                 </div>
             </div>
+            </div><!-- /meal-content -->
         </div>
 
         <!-- ============ [페이지: 소개] ============ -->
         <div id="page-intro" class="hidden space-y-4">
             <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5">
-                <h2 class="text-lg font-bold text-stone-900 font-traditional mb-2">오늘뭐먹지? 소개</h2>
-                <p class="text-xs text-stone-600 leading-relaxed mb-3">
+                <p class="text-sm font-bold text-emerald-950 font-traditional tracking-wide mb-3">
+                    "내 몸에 맞는 한 끼, 내일의 건강이 됩니다"
+                </p>
+                <p class="text-lg font-bold text-stone-900 font-traditional mb-3 leading-relaxed">
                     "오늘뭐먹지?"는 사상체질, 나이, 위치, 기상, 24절기를 함께 고려하여 나에게 꼭 맞는 오늘의 건강한 한 끼를 추천해 드리는 서비스입니다.
                 </p>
                 <ul class="text-xs text-stone-600 space-y-2 leading-relaxed list-disc list-inside">
@@ -500,6 +528,17 @@
 
         <!-- ============ [페이지: 회원소통창] ============ -->
         <div id="page-memberBoard" class="hidden space-y-4">
+            <!-- 비회원 안내 (회원만 이용 가능) -->
+            <div id="mb-nonmember-notice" class="hidden bg-white rounded-2xl border border-stone-200/80 shadow-xl p-6 text-center">
+                <i class="fa-solid fa-lock text-stone-300 text-3xl mb-3"></i>
+                <h4 class="text-sm font-bold text-stone-800 mb-1.5">회원소통창은 회원만 이용하실 수 있습니다</h4>
+                <p class="text-xs text-stone-500 leading-relaxed mb-4">회원가입 후 관리자 승인을 받으면, 회원들끼리 자유롭게 소통할 수 있는 회원소통창을 이용하실 수 있습니다.</p>
+                <button onclick="openAuthModal()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">
+                    <i class="fa-solid fa-user mr-1"></i> 로그인 / 회원가입
+                </button>
+            </div>
+
+            <div id="mb-page-content" class="space-y-4">
             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-[11px] text-amber-900 leading-relaxed">
                 <i class="fa-solid fa-lock mr-1"></i> 회원 전용 게시판입니다. (현재 미리보기 버전으로, 실제 서비스에서는 로그인·관리자 승인을 완료한 회원만 열람 및 작성이 가능합니다.)
             </div>
@@ -524,6 +563,7 @@
 
             <div id="mb-list" class="space-y-3"></div>
             <div id="mb-pagination" class="flex justify-center flex-wrap gap-1.5 pt-2"></div>
+            </div><!-- /mb-page-content -->
         </div>
 
         <!-- ============ [페이지: 관리자] ============ -->
@@ -575,7 +615,7 @@
     </footer>
 
     <!-- 로그인 / 회원가입 모달 -->
-    <div id="auth-modal" class="hidden absolute inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onclick="closeAuthModalOutside(event)">
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onclick="closeAuthModalOutside(event)">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 relative" onclick="event.stopPropagation()">
             <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-stone-400 hover:text-stone-600">
                 <i class="fa-solid fa-xmark"></i>
@@ -741,6 +781,7 @@
             
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('meal-date').value = today;
+            document.getElementById('meal-period').value = mealPeriod;
             // updateAuthUI(), 게시판/식사기록/방문자수 초기화는
             // Firebase 인증 상태가 확정된 뒤 <script type="module">에서 진행됩니다.
         };
@@ -795,7 +836,7 @@
             if (page === 'memberBoard') renderBoard('mb');
             if (page === 'admin' && window.fbRenderAdmin) window.fbRenderAdmin();
 
-            document.getElementById('app-frame').scrollTo(0, 0);
+            window.scrollTo(0, 0);
         }
 
         function toggleMobileMenu() {
@@ -839,6 +880,7 @@
                 return;
             }
             const date = document.getElementById('meal-date').value;
+            const period = document.getElementById('meal-period').value;
             const type = document.getElementById('meal-type').value;
             const name = document.getElementById('meal-name').value.trim();
 
@@ -847,7 +889,7 @@
                 return;
             }
 
-            window.fbAddMealRecord({ date: date, type: type, name: name });
+            window.fbAddMealRecord({ date: date, period: period, type: type, name: name });
             document.getElementById('meal-name').value = '';
         }
 
@@ -872,6 +914,8 @@
                 const icon = isDelivery ? '<i class="fa-solid fa-motorcycle text-cyan-600"></i>' : '<i class="fa-solid fa-bowl-rice text-emerald-800"></i>';
                 const badgeClass = isDelivery ? 'bg-cyan-50 text-cyan-800 border-cyan-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
                 const typeText = isDelivery ? '배달 주문' : '직접 식사';
+                const periodLabelMap = { breakfast: '아침', lunch: '점심', dinner: '저녁' };
+                const periodText = periodLabelMap[record.period] || '';
 
                 const item = document.createElement('div');
                 item.className = "flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-200/50 shadow-sm";
@@ -881,7 +925,7 @@
                             ${icon}
                         </div>
                         <div>
-                            <p class="text-xs font-bold text-stone-900 font-traditional mb-0.5">${record.name}</p>
+                            <p class="text-xs font-bold text-stone-900 font-traditional mb-0.5">${periodText ? '[' + periodText + '] ' : ''}${record.name}</p>
                             <p class="text-[10px] text-stone-500 font-sans">${record.date}${record.time ? ' ' + record.time : ''}</p>
                         </div>
                     </div>
@@ -1057,10 +1101,14 @@
             const formattedDate = `${nowTime.getFullYear()}.${String(nowTime.getMonth() + 1).padStart(2, '0')}.${String(nowTime.getDate()).padStart(2, '0')}`;
             const currentHour = nowTime.getHours();
             
+            const guidanceFormatted = getCurrentTimeGuidance(profile.birth)
+                .replace('<b>[상황]', '<br><b>[상황]')
+                .replace('<b>[대응]', '<br><b>[대응]');
+
             document.getElementById('dash-user-fortune').innerHTML = `
                 <div class="space-y-1.5">
                     <div><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1.5"></i><b>오늘(${formattedDate})의 운세:</b> ${getTodayFortune(profile.birth)}</div>
-                    <div class="pt-1.5 border-t border-amber-200/40 mt-1.5"><i class="fa-solid fa-clock text-amber-500 mr-1.5"></i><b>현재 ${currentHour}시의 상황과 대응:</b> ${getCurrentTimeGuidance(profile.birth)}</div>
+                    <div class="pt-1.5 border-t border-amber-200/40 mt-1.5 leading-relaxed"><i class="fa-solid fa-clock text-amber-500 mr-1.5"></i><b>현재 ${currentHour}시의 상황과 대응:</b>${guidanceFormatted}</div>
                 </div>
             `;
             
@@ -1152,6 +1200,9 @@
             const top5Container = document.getElementById('top5-menu-container');
             top5Container.innerHTML = '';
             renderMenuList(top5Container, recommendedFoods);
+
+            document.getElementById('dash-top1-name').innerText = recommendedFoods[0] || '-';
+            document.getElementById('dash-top2-name').innerText = recommendedFoods[1] || '-';
 
             changeDeliveryTier(currentDeliveryTier);
 
@@ -1512,7 +1563,25 @@
             const adminBtns = [document.getElementById('admin-menu-btn-desktop'), document.getElementById('admin-menu-btn-mobile')];
             adminBtns.forEach(function (btn) { if (btn) btn.classList.toggle('hidden', !window.isAdmin()); });
             updateBoardAuthorLabelsOnly();
+            updateMemberGates();
         };
+
+        function updateMemberGates() {
+            // 비회원(로그인 안 함/익명)에게는 회원 전용 영역 대신 안내를 보여줍니다.
+            const isMember = !!getCurrentUserSafe();
+
+            [
+                { notice: 'meal-nonmember-notice', content: 'meal-content' },
+                { notice: 'mb-nonmember-notice', content: 'mb-page-content' },
+                { notice: 'delivery-nonmember-notice', content: 'delivery-content' }
+            ].forEach(function (pair) {
+                const noticeEl = document.getElementById(pair.notice);
+                const contentEl = document.getElementById(pair.content);
+                if (!noticeEl || !contentEl) return;
+                noticeEl.classList.toggle('hidden', isMember);
+                contentEl.classList.toggle('hidden', !isMember);
+            });
+        }
 
         function updateBoardAuthorLabelsOnly() {
             const cu = getCurrentUserSafe();
@@ -1791,6 +1860,7 @@
             try {
                 await addDoc(collection(db, 'members', uid, 'mealRecords'), {
                     date: record.date,
+                    period: record.period || '',
                     time: formatNow().split(' ')[1],
                     type: record.type,
                     name: record.name,
