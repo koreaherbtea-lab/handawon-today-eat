@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" class="fs-small">
+<html lang="ko" class="fs-1">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -50,10 +50,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        /* 글자크기 3단계 설정 (작게/보통/크게) - 기본값은 '작게' */
-        html.fs-small { font-size: 112.5%; }
-        html.fs-medium { font-size: 125%; }
-        html.fs-large { font-size: 137.5%; }
+        /* 글자크기 5단계 설정 (1단계=가장 작음 ~ 5단계=가장 큼) - 기본값은 1단계 */
+        html.fs-1 { font-size: 112.5%; }
+        html.fs-2 { font-size: 118.75%; }
+        html.fs-3 { font-size: 125%; }
+        html.fs-4 { font-size: 131.25%; }
+        html.fs-5 { font-size: 137.5%; }
 
         body {
             font-family: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;
@@ -70,15 +72,21 @@
             -webkit-tap-highlight-color: transparent;
         }
         /* 고정 px 단위(text-[9px] 등)는 위 rem 확대가 적용되지 않으므로 글자크기 단계별로 별도 보정 */
-        html.fs-small .text-\[9px\] { font-size: 11px !important; }
-        html.fs-small .text-\[10px\] { font-size: 12px !important; }
-        html.fs-small .text-\[11px\] { font-size: 13px !important; }
-        html.fs-medium .text-\[9px\] { font-size: 12px !important; }
-        html.fs-medium .text-\[10px\] { font-size: 13px !important; }
-        html.fs-medium .text-\[11px\] { font-size: 14px !important; }
-        html.fs-large .text-\[9px\] { font-size: 13px !important; }
-        html.fs-large .text-\[10px\] { font-size: 14px !important; }
-        html.fs-large .text-\[11px\] { font-size: 15px !important; }
+        html.fs-1 .text-\[9px\] { font-size: 11px !important; }
+        html.fs-1 .text-\[10px\] { font-size: 12px !important; }
+        html.fs-1 .text-\[11px\] { font-size: 13px !important; }
+        html.fs-2 .text-\[9px\] { font-size: 11.5px !important; }
+        html.fs-2 .text-\[10px\] { font-size: 12.5px !important; }
+        html.fs-2 .text-\[11px\] { font-size: 13.5px !important; }
+        html.fs-3 .text-\[9px\] { font-size: 12px !important; }
+        html.fs-3 .text-\[10px\] { font-size: 13px !important; }
+        html.fs-3 .text-\[11px\] { font-size: 14px !important; }
+        html.fs-4 .text-\[9px\] { font-size: 12.5px !important; }
+        html.fs-4 .text-\[10px\] { font-size: 13.5px !important; }
+        html.fs-4 .text-\[11px\] { font-size: 14.5px !important; }
+        html.fs-5 .text-\[9px\] { font-size: 13px !important; }
+        html.fs-5 .text-\[10px\] { font-size: 14px !important; }
+        html.fs-5 .text-\[11px\] { font-size: 15px !important; }
 
         html, body {
             margin: 0;
@@ -99,17 +107,17 @@
     <div class="sticky top-0 z-50">
         <!-- 헤더 영역 -->
         <header class="border-b border-stone-200/60 bg-white/80 backdrop-blur-md">
-            <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <div class="max-w-xl md:max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
                 <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-stone-100 rounded-full overflow-hidden border border-stone-200">
                     <img src="한다원.394.394_2.png" alt="한다원 로고" class="w-full h-full object-contain block" 
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <span class="hidden text-xs font-bold text-emerald-900 font-traditional tracking-tighter" style="display:none;">한다원</span>
                 </div>
                 <div class="flex-grow"></div>
-                <div id="fs-toggle" class="flex-shrink-0 flex items-center gap-0.5 bg-stone-100 rounded-full p-0.5">
-                    <button id="fs-btn-small" onclick="setFontSize('small')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">작게</button>
-                    <button id="fs-btn-medium" onclick="setFontSize('medium')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">보통</button>
-                    <button id="fs-btn-large" onclick="setFontSize('large')" class="fs-btn px-2 py-1 rounded-full text-[10px] font-bold transition-colors">크게</button>
+                <div id="fs-toggle" class="flex-shrink-0 flex items-center gap-1.5 bg-stone-100 rounded-full pl-2.5 pr-1 py-1">
+                    <span class="text-[10px] font-bold text-stone-600 whitespace-nowrap">글자크기: <span id="fs-level-label">1</span>단계</span>
+                    <button id="fs-btn-decrease" onclick="changeFontSize(-1)" class="text-[10px] font-bold bg-white text-stone-600 hover:bg-stone-200 transition-colors px-2 py-1 rounded-full">작게</button>
+                    <button id="fs-btn-increase" onclick="changeFontSize(1)" class="text-[10px] font-bold bg-white text-stone-600 hover:bg-stone-200 transition-colors px-2 py-1 rounded-full">크게</button>
                 </div>
                 <button id="auth-btn" onclick="openAuthModal()" class="flex-shrink-0 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5 hover:bg-emerald-100 transition-colors whitespace-nowrap">
                     <i class="fa-solid fa-user mr-1"></i><span id="auth-btn-label">로그인</span>
@@ -119,7 +127,7 @@
 
         <!-- 메뉴바: PC는 가로 배치, 모바일은 클릭 시 세로 목록 -->
         <nav id="main-menu" class="bg-emerald-950 shadow-md">
-            <div class="max-w-xl mx-auto px-3">
+            <div class="max-w-xl md:max-w-6xl mx-auto px-3">
                 <!-- 데스크톱 가로 메뉴 -->
                 <div class="hidden md:flex items-center justify-center gap-1 py-1.5">
                     <button onclick="showPage('intro')" data-menu="intro" class="menu-btn flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-white/80 transition-colors hover:bg-emerald-900 hover:text-white">소개</button>
@@ -149,7 +157,7 @@
     </div>
 
     <!-- 메인 콘텐츠 영역 -->
-    <main class="flex-grow max-w-xl w-full mx-auto px-3 py-4 pb-20">
+    <main class="flex-grow max-w-xl md:max-w-6xl w-full mx-auto px-3 py-4 pb-20">
 
         <!-- ============ [페이지: 오늘뭐먹지?] ============ -->
         <div id="page-eat">
@@ -214,10 +222,11 @@
         </div>
 
         <!-- [1] 정기 사용자 개인화 메인 대시보드 화면 -->
-        <div id="main-dashboard" class="hidden space-y-4">
-
+        <div id="main-dashboard" class="hidden">
+            <div class="md:flex md:gap-4 md:items-start">
+                <div class="contents space-y-4 md:flex md:flex-col md:gap-4 md:space-y-0 md:flex-1 md:min-w-0">
             <!-- 종합 약선 추천식사 TOP5 중 1·2순위 하이라이트 -->
-            <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 rounded-2xl shadow-xl p-4 text-white">
+            <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 rounded-2xl shadow-xl p-4 text-white break-inside-avoid">
                 <h4 class="text-[11px] font-bold text-emerald-200 tracking-wider uppercase mb-2.5 flex items-center">
                     <i class="fa-solid fa-crown text-amber-300 mr-1.5"></i> 오늘의 종합 약선 추천 BEST 2
                 </h4>
@@ -233,46 +242,8 @@
                 </div>
             </div>
             
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 flex flex-col space-y-3">
-                <div class="flex items-center justify-between border-b border-stone-100 pb-2">
-                    <div>
-                        <h2 class="text-base font-bold text-stone-900 font-traditional"><span id="dash-user-name" class="text-emerald-800">사용자</span>님의 정보</h2>
-                        <p id="dash-user-meta" class="text-[11px] text-stone-500 font-medium">성별 · 나이 로딩 중</p>
-                        <p id="dash-user-constitution" class="text-xs text-stone-700 font-bold mt-0.5">체질 정보 로딩 중</p>
-                        <div id="dash-user-fortune" class="text-[11px] text-amber-900 bg-amber-50 border border-amber-200/40 px-2.5 py-1.5 rounded-xl mt-2 font-medium leading-relaxed"></div>
-                    </div>
-                    <span id="dash-gender-icon" class="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 text-xs"></span>
-                </div>
-                
-                <div class="grid grid-cols-3 gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200/40 text-[11px]">
-                    <div class="flex flex-col p-1">
-                        <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-location-dot text-emerald-800 mr-0.5"></i> 행정구역</span>
-                        <span id="dash-location" class="font-bold text-stone-700 truncate">전북 완주군</span>
-                    </div>
-                    <div class="flex flex-col p-1 border-l border-stone-200">
-                        <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-cloud-sun text-sky-600 mr-0.5"></i> 실시간 날씨</span>
-                        <span id="dash-weather" class="font-bold text-stone-700 truncate">24°C 흐림</span>
-                    </div>
-                    <div class="flex flex-col p-1 border-l border-stone-200">
-                        <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-calendar-check text-amber-700 mr-0.5"></i> 현재 절기</span>
-                        <span id="dash-solarterm" class="font-bold text-amber-900 truncate">하지(夏至)</span>
-                    </div>
-                </div>
-                <div id="dash-solarterm-desc" class="text-[11px] bg-amber-50/60 p-2 rounded-lg text-stone-600 border border-amber-100/50 leading-relaxed">
-                    절기 특징 한줄 요약 영역
-                </div>
-            </div>
-
-            <!-- [상시 노출 변경] 추천 식사 바로 위에 위치하는 최근 식단 연동 분석 가이드 바 -->
-            <div id="dash-meal-analysis-summary" class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-rose-700">
-                <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase flex items-center mb-2 border-b border-stone-100 pb-2">
-                    <i class="fa-solid fa-heart-pulse text-rose-700 mr-1.5 animate-pulse"></i> 최근 식사 누적 분석 가이드
-                </h4>
-                <div id="dash-analysis-text" class="text-xs leading-relaxed text-stone-600 font-medium"></div>
-            </div>
-
             <!-- 종합 약선 추천 식사 TOP 5 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 break-inside-avoid">
                 <div class="flex items-center justify-between mb-3 border-b border-stone-100 pb-2">
                     <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase flex items-center">
                         <i class="fa-solid fa-bowl-rice text-emerald-800 mr-1.5"></i> 종합 약선 추천 식사 TOP 5
@@ -281,9 +252,8 @@
                 </div>
                 <div id="top5-menu-container" class="space-y-2"></div>
             </div>
-
             <!-- 실시간 배달 앱 매칭 추천 TOP 5 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 break-inside-avoid">
                 <div class="flex items-center justify-between mb-3 border-b border-stone-100 pb-2">
                     <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase flex items-center">
                         <i class="fa-solid fa-motorcycle text-cyan-600 mr-1.5 animate-bounce"></i> 실시간 배달 앱 매칭 추천 TOP 5
@@ -313,8 +283,41 @@
                 <p id="dash-menu-reason" class="text-stone-600 text-xs leading-relaxed mt-3 bg-stone-50 p-2.5 rounded-xl border border-stone-200/40"></p>
                 </div><!-- /delivery-content -->
             </div>
-
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-amber-600">
+                </div>
+                <div class="contents space-y-4 md:flex md:flex-col md:gap-4 md:space-y-0 md:flex-1 md:min-w-0">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 flex flex-col space-y-3 break-inside-avoid mt-4 md:mt-0">
+                <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+                    <div>
+                        <h2 class="text-base font-bold text-stone-900 font-traditional"><span id="dash-user-name" class="text-emerald-800">사용자</span>님의 정보</h2>
+                        <p id="dash-user-meta" class="text-[11px] text-stone-500 font-medium">성별 · 나이 로딩 중</p>
+                        <p id="dash-user-constitution" class="text-xs text-stone-700 font-bold mt-0.5">체질 정보 로딩 중</p>
+                        <div id="dash-user-fortune" class="text-xs text-amber-900 bg-amber-50 border border-amber-200/40 px-2.5 py-1.5 rounded-xl mt-2 font-medium leading-relaxed"></div>
+                    </div>
+                    <span id="dash-gender-icon" class="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 text-xs"></span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200/40 text-[11px]">
+                    <div class="flex flex-col p-1">
+                        <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-location-dot text-emerald-800 mr-0.5"></i> 행정구역</span>
+                        <span id="dash-location" class="font-bold text-stone-700 truncate">전북 완주군</span>
+                    </div>
+                    <div class="flex flex-col p-1 border-l border-stone-200">
+                        <span class="text-[10px] text-stone-400 font-bold mb-0.5 flex items-center justify-between">
+                            <span><i class="fa-solid fa-cloud-sun text-sky-600 mr-0.5"></i> 실시간 날씨</span>
+                            <span id="dash-current-time" class="text-stone-400 font-normal">--:--</span>
+                        </span>
+                        <span id="dash-weather" class="font-bold text-stone-700 truncate">24°C 흐림</span>
+                    </div>
+                    <div class="flex flex-col p-1 border-l border-stone-200">
+                        <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-calendar-check text-amber-700 mr-0.5"></i> 현재 절기</span>
+                        <span id="dash-solarterm" class="font-bold text-amber-900 truncate">하지(夏至)</span>
+                    </div>
+                </div>
+                <div id="dash-solarterm-desc" class="text-[11px] bg-amber-50/60 p-2 rounded-lg text-stone-600 border border-amber-100/50 leading-relaxed">
+                    절기 특징 한줄 요약 영역
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-amber-600 break-inside-avoid">
                 <h4 class="text-xs font-bold text-stone-900 font-traditional mb-2.5 flex items-center">
                     <i class="fa-solid fa-heart-circle-check text-amber-600 mr-1.5 text-sm"></i> 체질 및 절기 융합 건강 양생 지침
                 </h4>
@@ -329,8 +332,14 @@
                     </div>
                 </div>
             </div>
-
-            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
+            <!-- [상시 노출 변경] 추천 식사 바로 위에 위치하는 최근 식단 연동 분석 가이드 바 -->
+            <div id="dash-meal-analysis-summary" class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-rose-700 break-inside-avoid">
+                <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase flex items-center mb-2 border-b border-stone-100 pb-2">
+                    <i class="fa-solid fa-heart-pulse text-rose-700 mr-1.5 animate-pulse"></i> 최근 식사 누적 분석 가이드
+                </h4>
+                <div id="dash-analysis-text" class="text-xs leading-relaxed text-stone-600 font-medium"></div>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2 break-inside-avoid">
                 <h4 class="text-xs font-bold text-emerald-900 flex items-center">
                     <i class="fa-solid fa-circle-info text-emerald-700 mr-1.5"></i> 오늘 드신 음식, 이렇게 기록해보세요
                 </h4>
@@ -343,11 +352,12 @@
                     <i class="fa-solid fa-pen-to-square mr-1"></i> 지금 바로 식사 기록하러 가기
                 </button>
             </div>
-
-            <div class="pt-2">
+            <div class="pt-2 break-inside-avoid">
                 <button onclick="resetUserProfile()" class="w-full bg-stone-800 hover:bg-stone-900 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-md transition-all active:scale-[0.99]">
                     <i class="fa-solid fa-arrows-rotate"></i> <span>건강 정보 및 프로필 등록 / 변경하기</span>
                 </button>
+            </div>
+                </div>
             </div>
         </div>
 
@@ -414,9 +424,10 @@
                 </button>
             </div>
 
-            <div id="meal-content" class="space-y-4">
+            <div id="meal-content">
+                <div class="space-y-4 md:columns-2 md:gap-4">
             <!-- [배치 1] 새로운 식사 기록 추가 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 break-inside-avoid">
                 <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center">
                     <i class="fa-solid fa-pen-to-square text-emerald-800 mr-1.5"></i> 새로운 식사 기록 추가
                 </h4>
@@ -460,7 +471,7 @@
             </div>
 
             <!-- [배치 2] 최근 식사에 대한 건강 정보 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-rose-700">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 border-l-4 border-l-rose-700 break-inside-avoid">
                 <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center">
                     <i class="fa-solid fa-heart-pulse text-rose-700 mr-1.5 animate-pulse"></i> 최근 식사에 대한 건강 정보
                 </h4>
@@ -468,25 +479,28 @@
             </div>
 
             <!-- [배치 3] 나의 식사 히스토리 -->
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 break-inside-avoid">
                 <h4 class="text-sm font-bold text-stone-900 font-traditional mb-3 border-b border-stone-100 pb-2 flex items-center justify-between">
                     <span><i class="fa-solid fa-clock-rotate-left text-stone-600 mr-1.5"></i> 나의 식사 히스토리</span>
-                    <span class="text-[10px] font-normal text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">최근 일자순</span>
+                    <span class="text-[10px] font-normal text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">최근 7일</span>
                 </h4>
                 
                 <div id="meal-history-container" class="space-y-2 mt-3"></div>
+                <div id="meal-history-pagination" class="flex justify-center flex-wrap gap-1.5 pt-3"></div>
                 
                 <div id="empty-history-msg" class="hidden text-center py-6">
                     <i class="fa-solid fa-folder-open text-stone-300 text-2xl mb-2"></i>
                     <p class="text-xs text-stone-500">아직 등록된 식사 기록이 없습니다.</p>
                 </div>
             </div>
+                </div>
             </div><!-- /meal-content -->
         </div>
 
         <!-- ============ [페이지: 소개] ============ -->
-        <div id="page-intro" class="hidden space-y-4">
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5">
+        <div id="page-intro" class="hidden">
+            <div class="space-y-4 md:columns-2 md:gap-4">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5 break-inside-avoid">
                 <p class="text-sm font-bold text-emerald-950 font-traditional tracking-wide mb-3">
                     "내 몸에 맞는 한 끼, 내일의 건강이 됩니다"
                 </p>
@@ -499,7 +513,7 @@
                     <li>모두가 참여하는 소통창 / 회원 전용 회원소통창</li>
                 </ul>
             </div>
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5 break-inside-avoid">
                 <h3 class="text-sm font-bold text-stone-900 font-traditional mb-3">회원 · 비회원 이용 안내</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-[11px] text-center border-collapse">
@@ -526,7 +540,7 @@
                 </p>
             </div>
 
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5 text-center">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-5 text-center break-inside-avoid">
                 <h3 class="text-sm font-bold text-stone-900 font-traditional mb-3">
                     <i class="fa-solid fa-qrcode text-emerald-800 mr-1.5"></i>QR코드로 바로가기
                 </h3>
@@ -535,30 +549,37 @@
                     스마트폰 카메라로 QR코드를 스캔하면 이 사이트로 바로 접속할 수 있습니다.
                 </p>
             </div>
+            </div>
         </div>
 
         <!-- ============ [페이지: 소통창] ============ -->
         <div id="page-board" class="hidden space-y-4">
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 space-y-3">
-                <h4 class="text-sm font-bold text-stone-900 font-traditional flex items-center">
-                    <i class="fa-solid fa-comments text-emerald-800 mr-1.5"></i> 소통창 글쓰기
-                </h4>
-                <input type="text" id="board-author" placeholder="이름(닉네임)" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
-                <textarea id="board-content" rows="3" placeholder="자유롭게 이야기를 나눠보세요." class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all resize-none"></textarea>
-                <div class="flex items-center gap-2">
-                    <label class="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 cursor-pointer hover:bg-stone-100 transition-colors">
-                        <i class="fa-solid fa-camera"></i> 사진 첨부
-                        <input type="file" id="board-photo" accept="image/*" class="hidden" onchange="previewPhoto(this,'board')">
-                    </label>
-                    <img id="board-photo-preview" class="hidden h-12 w-12 object-cover rounded-lg border border-stone-200">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+                <button onclick="toggleWriteForm('board')" id="board-write-toggle" class="w-full flex items-center justify-between text-sm font-bold text-stone-900 font-traditional">
+                    <span><i class="fa-solid fa-comments text-emerald-800 mr-1.5"></i> 소통창 글쓰기</span>
+                    <i id="board-write-toggle-icon" class="fa-solid fa-chevron-down text-xs text-stone-400 transition-transform"></i>
+                </button>
+                <div id="board-write-form" class="hidden mt-3 space-y-3">
+                    <input type="text" id="board-author" placeholder="이름(닉네임)" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                    <textarea id="board-content" rows="3" placeholder="자유롭게 이야기를 나눠보세요." class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all resize-none"></textarea>
+                    <div class="flex items-center gap-2">
+                        <label class="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 cursor-pointer hover:bg-stone-100 transition-colors">
+                            <i class="fa-solid fa-camera"></i> 사진 첨부
+                            <input type="file" id="board-photo" accept="image/*" class="hidden" onchange="previewPhoto(this,'board')">
+                        </label>
+                        <img id="board-photo-preview" class="hidden h-12 w-12 object-cover rounded-lg border border-stone-200">
+                    </div>
+                    <p class="text-[10px] text-stone-400 leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1"></i>사진은 1MB 이하만 첨부 가능합니다. (더 큰 사진은 자동으로 용량을 줄여 저장합니다)
+                    </p>
+                    <p class="text-[10px] text-rose-600 leading-relaxed">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>광고, 욕설, 혐오 발언 등 부적절한 게시글은 관리자에 의해 사전 통보 없이 삭제될 수 있습니다.
+                    </p>
+                    <button onclick="submitPost('board')" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">등록하기</button>
                 </div>
-                <p class="text-[10px] text-rose-600 leading-relaxed">
-                    <i class="fa-solid fa-triangle-exclamation mr-1"></i>광고, 욕설, 혐오 발언 등 부적절한 게시글은 관리자에 의해 사전 통보 없이 삭제될 수 있습니다.
-                </p>
-                <button onclick="submitPost('board')" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">등록하기</button>
             </div>
 
-            <div id="board-list" class="space-y-3"></div>
+            <div id="board-list" class="md:columns-2 md:gap-3"></div>
             <div id="board-pagination" class="flex justify-center flex-wrap gap-1.5 pt-2"></div>
         </div>
 
@@ -578,26 +599,32 @@
             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-[11px] text-amber-900 leading-relaxed">
                 <i class="fa-solid fa-lock mr-1"></i> 회원 전용 게시판입니다. (현재 미리보기 버전으로, 실제 서비스에서는 로그인·관리자 승인을 완료한 회원만 열람 및 작성이 가능합니다.)
             </div>
-            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 space-y-3">
-                <h4 class="text-sm font-bold text-stone-900 font-traditional flex items-center">
-                    <i class="fa-solid fa-user-group text-amber-700 mr-1.5"></i> 회원소통창 글쓰기
-                </h4>
-                <input type="text" id="mb-author" placeholder="이름(닉네임)" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
-                <textarea id="mb-content" rows="3" placeholder="회원끼리 자유롭게 이야기를 나눠보세요." class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all resize-none"></textarea>
-                <div class="flex items-center gap-2">
-                    <label class="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 cursor-pointer hover:bg-stone-100 transition-colors">
-                        <i class="fa-solid fa-camera"></i> 사진 첨부
-                        <input type="file" id="mb-photo" accept="image/*" class="hidden" onchange="previewPhoto(this,'mb')">
-                    </label>
-                    <img id="mb-photo-preview" class="hidden h-12 w-12 object-cover rounded-lg border border-stone-200">
+            <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4">
+                <button onclick="toggleWriteForm('mb')" id="mb-write-toggle" class="w-full flex items-center justify-between text-sm font-bold text-stone-900 font-traditional">
+                    <span><i class="fa-solid fa-user-group text-amber-700 mr-1.5"></i> 회원소통창 글쓰기</span>
+                    <i id="mb-write-toggle-icon" class="fa-solid fa-chevron-down text-xs text-stone-400 transition-transform"></i>
+                </button>
+                <div id="mb-write-form" class="hidden mt-3 space-y-3">
+                    <input type="text" id="mb-author" placeholder="이름(닉네임)" class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all">
+                    <textarea id="mb-content" rows="3" placeholder="회원끼리 자유롭게 이야기를 나눠보세요." class="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs focus:outline-emerald-800 focus:bg-white transition-all resize-none"></textarea>
+                    <div class="flex items-center gap-2">
+                        <label class="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 cursor-pointer hover:bg-stone-100 transition-colors">
+                            <i class="fa-solid fa-camera"></i> 사진 첨부
+                            <input type="file" id="mb-photo" accept="image/*" class="hidden" onchange="previewPhoto(this,'mb')">
+                        </label>
+                        <img id="mb-photo-preview" class="hidden h-12 w-12 object-cover rounded-lg border border-stone-200">
+                    </div>
+                    <p class="text-[10px] text-stone-400 leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1"></i>사진은 1MB 이하만 첨부 가능합니다. (더 큰 사진은 자동으로 용량을 줄여 저장합니다)
+                    </p>
+                    <p class="text-[10px] text-rose-600 leading-relaxed">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>광고, 욕설, 혐오 발언 등 부적절한 게시글은 관리자에 의해 사전 통보 없이 삭제될 수 있습니다.
+                    </p>
+                    <button onclick="submitPost('mb')" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">등록하기</button>
                 </div>
-                <p class="text-[10px] text-rose-600 leading-relaxed">
-                    <i class="fa-solid fa-triangle-exclamation mr-1"></i>광고, 욕설, 혐오 발언 등 부적절한 게시글은 관리자에 의해 사전 통보 없이 삭제될 수 있습니다.
-                </p>
-                <button onclick="submitPost('mb')" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-[0.99]">등록하기</button>
             </div>
 
-            <div id="mb-list" class="space-y-3"></div>
+            <div id="mb-list" class="md:columns-2 md:gap-3"></div>
             <div id="mb-pagination" class="flex justify-center flex-wrap gap-1.5 pt-2"></div>
             </div><!-- /mb-page-content -->
         </div>
@@ -631,7 +658,7 @@
 
     <!-- 푸터 영역 -->
     <footer class="border-t border-stone-200/60 bg-stone-100/50 py-5 pb-24 text-center text-[10px] text-stone-400">
-        <div class="max-w-xl mx-auto px-4 space-y-3.5 leading-relaxed flex flex-col items-center">
+        <div class="max-w-xl md:max-w-6xl mx-auto px-4 space-y-3.5 leading-relaxed flex flex-col items-center">
             <div class="flex items-center gap-3 text-[11px] font-bold text-stone-600 bg-white border border-stone-200 rounded-full px-4 py-1.5 shadow-sm">
                 <span><i class="fa-solid fa-eye text-emerald-800 mr-1"></i>오늘 방문자 <span id="visitor-today" class="text-emerald-800">0</span></span>
                 <span class="text-stone-300">|</span>
@@ -814,6 +841,8 @@
             checkUserProfile();
             initFontSize();
             showPage('eat');
+            startClock();
+            fetchLiveWeatherAndLocation();
             
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('meal-date').value = today;
@@ -823,27 +852,36 @@
         };
 
         /* =========================================================
-           글자크기 설정 (작게 / 보통 / 크게) - 기본값 '작게'
+           글자크기 설정 (1단계=가장 작음 ~ 5단계=가장 큼) - 기본값 1단계
         ========================================================= */
+        const FONT_SIZE_MIN = 1;
+        const FONT_SIZE_MAX = 5;
+
         function initFontSize() {
-            const saved = localStorage.getItem('font_size_pref') || 'small';
-            setFontSize(saved);
+            const saved = parseInt(localStorage.getItem('font_size_level') || '1', 10);
+            applyFontSize(saved);
         }
 
-        function setFontSize(size) {
-            document.documentElement.classList.remove('fs-small', 'fs-medium', 'fs-large');
-            document.documentElement.classList.add('fs-' + size);
-            localStorage.setItem('font_size_pref', size);
+        function changeFontSize(delta) {
+            let level = parseInt(localStorage.getItem('font_size_level') || '1', 10);
+            level = Math.min(FONT_SIZE_MAX, Math.max(FONT_SIZE_MIN, level + delta));
+            applyFontSize(level);
+        }
 
-            document.querySelectorAll('.fs-btn').forEach(function (btn) {
-                btn.classList.remove('bg-emerald-800', 'text-white');
-                btn.classList.add('text-stone-500');
-            });
-            const activeBtn = document.getElementById('fs-btn-' + size);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-emerald-800', 'text-white');
-                activeBtn.classList.remove('text-stone-500');
+        function applyFontSize(level) {
+            for (let i = FONT_SIZE_MIN; i <= FONT_SIZE_MAX; i++) {
+                document.documentElement.classList.remove('fs-' + i);
             }
+            document.documentElement.classList.add('fs-' + level);
+            localStorage.setItem('font_size_level', String(level));
+            document.getElementById('fs-level-label').innerText = level;
+
+            const decBtn = document.getElementById('fs-btn-decrease');
+            const incBtn = document.getElementById('fs-btn-increase');
+            decBtn.disabled = (level <= FONT_SIZE_MIN);
+            incBtn.disabled = (level >= FONT_SIZE_MAX);
+            decBtn.classList.toggle('opacity-40', decBtn.disabled);
+            incBtn.classList.toggle('opacity-40', incBtn.disabled);
         }
 
         /* =========================================================
@@ -880,6 +918,14 @@
             document.getElementById('mobile-menu-icon').classList.toggle('rotate-180');
         }
 
+        function toggleWriteForm(key) {
+            const form = document.getElementById(key + '-write-form');
+            const icon = document.getElementById(key + '-write-toggle-icon');
+            if (!form) return;
+            form.classList.toggle('hidden');
+            if (icon) icon.classList.toggle('rotate-180');
+        }
+
         /* =========================================================
            방문자 수 / 회원 인증 (로그인·회원가입·Google 로그인)
            * 실제 구현은 하단의 <script type="module"> (Firebase Auth/Firestore) 참고
@@ -896,6 +942,86 @@
             if (hour >= 5 && hour < 11) mealPeriod = 'breakfast';
             else if (hour >= 11 && hour < 17) mealPeriod = 'lunch';
             else mealPeriod = 'dinner';
+        }
+
+        /* =========================================================
+           실시간 시계
+        ========================================================= */
+        function startClock() {
+            function tick() {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const el = document.getElementById('dash-current-time');
+                if (el) el.innerText = hh + ':' + mm;
+            }
+            tick();
+            setInterval(tick, 30000);
+        }
+
+        /* =========================================================
+           실제 위치 기반 날씨 조회
+           * 기상청(KMA) 공식 API는 서비스키 발급 + 위경도→격자(nx,ny) 변환이 필요하고,
+             키를 브라우저 코드에 그대로 넣으면 노출되기 때문에, 키가 필요 없고 CORS를
+             지원하는 Open-Meteo(기상 관측·예보 데이터 제공)와 OpenStreetMap 좌표-주소
+             변환 서비스를 사용해 "현재 위치의 실시간 기온/날씨"를 가져옵니다.
+           * 위치 권한을 허용하지 않거나 조회에 실패하면 기존 예시 값을 그대로 사용합니다.
+        ========================================================= */
+        const WMO_WEATHER_TEXT = {
+            0: '맑음', 1: '대체로 맑음', 2: '구름 조금', 3: '흐림',
+            45: '안개', 48: '서리 안개',
+            51: '이슬비', 53: '이슬비', 55: '이슬비',
+            61: '비', 63: '비', 65: '강한 비',
+            71: '눈', 73: '눈', 75: '강한 눈', 77: '진눈깨비',
+            80: '소나기', 81: '소나기', 82: '강한 소나기',
+            85: '눈 소나기', 86: '눈 소나기',
+            95: '뇌우', 96: '뇌우(우박)', 99: '뇌우(우박)'
+        };
+
+        function fetchLiveWeatherAndLocation() {
+            if (!navigator.geolocation) return;
+
+            navigator.geolocation.getCurrentPosition(async function (pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+
+                try {
+                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=Asia%2FSeoul`);
+                    if (weatherRes.ok) {
+                        const weatherData = await weatherRes.json();
+                        const cur = weatherData.current;
+                        if (cur) {
+                            weatherInfo = {
+                                temp: Math.round(cur.temperature_2m),
+                                text: WMO_WEATHER_TEXT[cur.weather_code] || '흐림'
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.error('날씨 조회 실패:', e);
+                }
+
+                try {
+                    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&accept-language=ko`);
+                    if (geoRes.ok) {
+                        const geoData = await geoRes.json();
+                        const a = geoData.address || {};
+                        // 시/도, 시/군/구, 읍/면/동 단위로 최대한 정확하게 구성합니다.
+                        const region = a.state || a.province || '';
+                        const city = a.city || a.county || '';
+                        const dong = a.borough || a.suburb || a.village || a.town || a.neighbourhood || '';
+                        const parts = [region, city, dong].filter(Boolean);
+                        if (parts.length) geoInfo = { address: parts.join(' ') };
+                    }
+                } catch (e) {
+                    console.error('위치 정보 조회 실패:', e);
+                }
+
+                const profile = JSON.parse(localStorage.getItem('sasang_user_profile') || 'null');
+                if (profile) renderDashboard(profile);
+            }, function (err) {
+                console.warn('위치 권한이 허용되지 않아 예시 위치/날씨 데이터를 표시합니다.', err);
+            }, { timeout: 8000 });
         }
 
         function checkUserProfile() {
@@ -925,19 +1051,25 @@
                 return;
             }
 
+            mealHistoryPage = 1;
             window.fbAddMealRecord({ date: date, period: period, type: type, name: name });
             document.getElementById('meal-name').value = '';
         }
 
+        const MEAL_HISTORY_DAYS_PER_PAGE = 7;
+        let mealHistoryPage = 1;
+
         function renderMealHistory() {
             const container = document.getElementById('meal-history-container');
             const emptyMsg = document.getElementById('empty-history-msg');
+            const pagEl = document.getElementById('meal-history-pagination');
             container.innerHTML = '';
 
             analyzeMealHistory();
 
             if (mealRecords.length === 0) {
                 emptyMsg.classList.remove('hidden');
+                if (pagEl) pagEl.innerHTML = '';
                 return;
             } else {
                 emptyMsg.classList.add('hidden');
@@ -945,7 +1077,15 @@
 
             const sortedRecords = [...mealRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            sortedRecords.forEach(record => {
+            // 최근 날짜부터 7일(날짜 기준) 단위로 페이지를 나눕니다.
+            const uniqueDates = [...new Set(sortedRecords.map(r => r.date))];
+            const totalPages = Math.max(1, Math.ceil(uniqueDates.length / MEAL_HISTORY_DAYS_PER_PAGE));
+            if (mealHistoryPage > totalPages) mealHistoryPage = totalPages;
+            const startIdx = (mealHistoryPage - 1) * MEAL_HISTORY_DAYS_PER_PAGE;
+            const pageDates = new Set(uniqueDates.slice(startIdx, startIdx + MEAL_HISTORY_DAYS_PER_PAGE));
+            const pageRecords = sortedRecords.filter(r => pageDates.has(r.date));
+
+            pageRecords.forEach(record => {
                 const isDelivery = record.type === 'delivery';
                 const icon = isDelivery ? '<i class="fa-solid fa-motorcycle text-cyan-600"></i>' : '<i class="fa-solid fa-bowl-rice text-emerald-800"></i>';
                 const badgeClass = isDelivery ? 'bg-cyan-50 text-cyan-800 border-cyan-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
@@ -971,6 +1111,19 @@
                 `;
                 container.appendChild(item);
             });
+
+            if (pagEl) {
+                pagEl.innerHTML = '';
+                if (totalPages > 1) {
+                    for (let i = 1; i <= totalPages; i++) {
+                        const btn = document.createElement('button');
+                        btn.innerText = i;
+                        btn.className = "w-7 h-7 rounded-full text-xs font-bold transition-colors " + (i === mealHistoryPage ? "bg-emerald-800 text-white" : "bg-stone-100 text-stone-600 hover:bg-stone-200");
+                        btn.onclick = (function (pageNum) { return function () { mealHistoryPage = pageNum; renderMealHistory(); }; })(i);
+                        pagEl.appendChild(btn);
+                    }
+                }
+            }
         }
 
         function analyzeMealHistory() {
@@ -1143,7 +1296,7 @@
 
             document.getElementById('dash-user-fortune').innerHTML = `
                 <div class="space-y-1.5">
-                    <div><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1.5"></i><b>오늘(${formattedDate})의 운세:</b> ${getTodayFortune(profile.birth)}</div>
+                    <div><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1.5"></i><b>오늘(${formattedDate})의 운세:</b><br>${getTodayFortune(profile.birth)}</div>
                     <div class="pt-1.5 border-t border-amber-200/40 mt-1.5 leading-relaxed"><i class="fa-solid fa-clock text-amber-500 mr-1.5"></i><b>현재 ${currentHour}시의 상황과 대응:</b>${guidanceFormatted}</div>
                 </div>
             `;
@@ -1639,17 +1792,42 @@
         window.previewPhoto = function (input, key) {
             const file = input.files[0];
             if (!file) return;
-            if (file.size > 500 * 1024) {
-                alert('사진 용량이 너무 큽니다. 500KB 이하의 이미지를 사용해 주세요.');
+            if (file.size > 1024 * 1024) {
+                alert('사진 용량이 너무 큽니다. 1MB 이하의 이미지를 사용해 주세요.');
                 input.value = '';
                 return;
             }
+
             const reader = new FileReader();
             reader.onload = function (e) {
-                tempPhoto[key] = e.target.result;
-                const preview = document.getElementById(key + '-photo-preview');
-                preview.src = e.target.result;
-                preview.classList.remove('hidden');
+                const img = new Image();
+                img.onload = function () {
+                    // 원본 용량이 커도 DB에는 가볍게 저장되도록 자동으로 크기/용량을 줄입니다.
+                    const MAX_DIM = 1000;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > MAX_DIM || height > MAX_DIM) {
+                        if (width > height) { height = Math.round(height * (MAX_DIM / width)); width = MAX_DIM; }
+                        else { width = Math.round(width * (MAX_DIM / height)); height = MAX_DIM; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                    let quality = 0.82;
+                    let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    while (dataUrl.length > 700 * 1024 && quality > 0.4) {
+                        quality -= 0.1;
+                        dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    }
+
+                    tempPhoto[key] = dataUrl;
+                    const preview = document.getElementById(key + '-photo-preview');
+                    preview.src = dataUrl;
+                    preview.classList.remove('hidden');
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         };
@@ -1684,6 +1862,10 @@
                 tempPhoto[key] = null;
                 document.getElementById(key + '-photo-preview').classList.add('hidden');
                 document.getElementById(key + '-photo').value = '';
+                if (window.toggleWriteForm) {
+                    const formEl = document.getElementById(key + '-write-form');
+                    if (formEl && !formEl.classList.contains('hidden')) window.toggleWriteForm(key);
+                }
             } catch (e) {
                 console.error(e);
                 alert('글 등록에 실패했습니다: ' + (e.code || e.message));
@@ -1695,6 +1877,10 @@
             if (!post) return;
             if (!window.isAdmin() && post.authorId !== window.getAuthorId()) {
                 alert('본인이 작성한 글만 삭제할 수 있습니다.');
+                return;
+            }
+            if ((post.comments || []).length > 0) {
+                alert('댓글이 모두 삭제되어야 글을 삭제할 수 있습니다. 댓글을 먼저 삭제해 주세요.');
                 return;
             }
             if (!confirm('이 글을 삭제하시겠습니까?')) return;
@@ -1825,13 +2011,13 @@
                 }).join('');
 
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl border border-stone-200/80 shadow-lg p-4 space-y-2.5";
+                card.className = "bg-white rounded-2xl border border-stone-200/80 shadow-lg p-4 space-y-2.5 mb-3 break-inside-avoid";
                 card.innerHTML =
                     '<div class="flex items-center justify-between">' +
                         '<span class="text-xs font-bold text-stone-800"><i class="fa-solid fa-circle-user text-emerald-800 mr-1"></i>' + escapeHtml(post.author) + '</span>' +
                         '<div class="flex items-center gap-2">' +
                             '<span class="text-[10px] text-stone-400">' + (post.timeLabel || '') + '</span>' +
-                            (canDeletePost ? ('<button onclick="deletePost(\'' + key + '\', \'' + post.id + '\')" class="text-stone-300 hover:text-rose-600 transition-colors" title="글 삭제"><i class="fa-solid fa-trash-can text-[11px]"></i></button>') : '') +
+                            (canDeletePost ? ('<button onclick="deletePost(\'' + key + '\', \'' + post.id + '\')" class="text-stone-300 hover:text-rose-600 transition-colors" title="' + (comments.length > 0 ? '댓글을 모두 삭제해야 글을 삭제할 수 있습니다' : '글 삭제') + '"><i class="fa-solid fa-trash-can text-[11px]"></i></button>') : '') +
                         '</div>' +
                     '</div>' +
                     '<p class="text-xs text-stone-700 leading-relaxed whitespace-pre-line">' + escapeHtml(post.content) + '</p>' +
