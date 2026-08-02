@@ -298,15 +298,18 @@
                 
                 <div class="grid grid-cols-3 gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200/40 text-[11px]">
                     <div class="flex flex-col p-1">
-                        <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-location-dot text-emerald-800 mr-0.5"></i> 행정구역</span>
+                        <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-location-dot text-emerald-800 mr-0.5"></i> 행정구역 <span id="dash-location-badge" class="hidden text-[8px] text-amber-600 font-normal">(예시)</span></span>
                         <span id="dash-location" class="font-bold text-stone-700 truncate">전북 완주군</span>
                     </div>
                     <div class="flex flex-col p-1 border-l border-stone-200">
                         <span class="text-[10px] text-stone-400 font-bold mb-0.5 flex items-center justify-between">
-                            <span><i class="fa-solid fa-cloud-sun text-sky-600 mr-0.5"></i> 실시간 날씨</span>
+                            <span><i class="fa-solid fa-cloud-sun text-sky-600 mr-0.5"></i> 실시간 날씨 <span id="dash-weather-badge" class="hidden text-[8px] text-amber-600 font-normal">(예시)</span></span>
                             <span id="dash-current-time" class="text-stone-400 font-normal">--:--</span>
                         </span>
-                        <span id="dash-weather" class="font-bold text-stone-700 truncate">24°C 흐림</span>
+                        <span id="dash-weather" class="font-bold text-stone-700 truncate">
+                            24°C 흐림
+                            <button onclick="fetchLiveWeatherAndLocation(true)" title="실제 날씨 다시 불러오기" class="ml-1 text-stone-300 hover:text-emerald-800 transition-colors"><i class="fa-solid fa-rotate text-[10px]"></i></button>
+                        </span>
                     </div>
                     <div class="flex flex-col p-1 border-l border-stone-200">
                         <span class="text-[10px] text-stone-400 font-bold mb-0.5"><i class="fa-solid fa-calendar-check text-amber-700 mr-0.5"></i> 현재 절기</span>
@@ -816,6 +819,7 @@
         let answers = [];
         let geoInfo = { address: "전북특별자치도 완주군" };
         let weatherInfo = { temp: 24, text: "흐림" };
+        let weatherIsLive = false;
         let mealPeriod = 'lunch'; // 'breakfast' | 'lunch' | 'dinner'
         window.mealRecords = [];
         let currentDeliveryTier = 'over30k';
@@ -978,12 +982,16 @@
             95: '뇌우', 96: '뇌우(우박)', 99: '뇌우(우박)'
         };
 
-        function fetchLiveWeatherAndLocation() {
-            if (!navigator.geolocation) return;
+        function fetchLiveWeatherAndLocation(isManualRetry) {
+            if (!navigator.geolocation) {
+                if (isManualRetry) alert('이 브라우저에서는 위치 정보 기능을 지원하지 않아 실제 날씨를 가져올 수 없습니다.');
+                return;
+            }
 
             navigator.geolocation.getCurrentPosition(async function (pos) {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
+                let weatherOk = false;
 
                 try {
                     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=Asia%2FSeoul`);
@@ -995,6 +1003,7 @@
                                 temp: Math.round(cur.temperature_2m),
                                 text: WMO_WEATHER_TEXT[cur.weather_code] || '흐림'
                             };
+                            weatherOk = true;
                         }
                     }
                 } catch (e) {
@@ -1017,10 +1026,19 @@
                     console.error('위치 정보 조회 실패:', e);
                 }
 
+                weatherIsLive = weatherOk;
+                if (isManualRetry && !weatherOk) {
+                    alert('날씨 정보를 가져오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+                }
+
                 const profile = JSON.parse(localStorage.getItem('sasang_user_profile') || 'null');
                 if (profile) renderDashboard(profile);
             }, function (err) {
                 console.warn('위치 권한이 허용되지 않아 예시 위치/날씨 데이터를 표시합니다.', err);
+                weatherIsLive = false;
+                if (isManualRetry) {
+                    alert('위치 권한이 거부되어 있어 실제 날씨를 가져올 수 없습니다.\n브라우저 주소창의 자물쇠(또는 정보) 아이콘 → 사이트 설정에서 "위치"를 허용으로 바꾼 뒤 다시 시도해 주세요.');
+                }
             }, { timeout: 8000 });
         }
 
@@ -1302,7 +1320,12 @@
             `;
             
             document.getElementById('dash-location').innerText = geoInfo.address;
-            document.getElementById('dash-weather').innerText = `${weatherInfo.temp}°C (${weatherInfo.text})`;
+            document.getElementById('dash-weather').innerHTML = `${weatherInfo.temp}°C ${weatherInfo.text}
+                <button onclick="fetchLiveWeatherAndLocation(true)" title="실제 날씨 다시 불러오기" class="ml-1 text-stone-300 hover:text-emerald-800 transition-colors"><i class="fa-solid fa-rotate text-[10px]"></i></button>`;
+            const locBadge = document.getElementById('dash-location-badge');
+            const weatherBadge = document.getElementById('dash-weather-badge');
+            if (locBadge) locBadge.classList.toggle('hidden', weatherIsLive);
+            if (weatherBadge) weatherBadge.classList.toggle('hidden', weatherIsLive);
             document.getElementById('dash-solarterm').innerText = solartermData.name;
             document.getElementById('dash-solarterm-desc').innerHTML = `<i class="fa-solid fa-quote-left text-amber-400 mr-1 text-[9px]"></i><b>${solartermData.name} 특징:</b> ${solartermData.desc}`;
             
@@ -1419,7 +1442,7 @@
         function renderMenuList(container, items) {
             items.forEach((food, index) => {
                 const priorityLabels = ["1순위 (최적 약선)", "2순위 (추천 약선)", "3순위 (조화 약선)", "4순위 (보완 약선)", "5순위 (대안 약선)"];
-                const badgeColors = ["bg-emerald-800", "bg-emerald-600", "bg-amber-600", "bg-stone-500", "bg-stone-400"];
+                const badgeColors = ["bg-emerald-950", "bg-emerald-800", "bg-emerald-700", "bg-emerald-600", "bg-emerald-500"];
                 
                 const card = document.createElement('div');
                 card.className = "flex items-center justify-between p-2.5 bg-stone-50 rounded-xl border border-stone-200/50 shadow-sm active:bg-stone-100 transition-colors";
