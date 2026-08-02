@@ -2141,8 +2141,13 @@
 
             if (!sessionStorage.getItem('visited_this_session')) {
                 sessionStorage.setItem('visited_this_session', '1');
-                const update = { total: increment(1) };
-                update['byDate.' + today] = increment(1);
+                // 점(.)이 포함된 문자열 키(예: 'byDate.2026-08-02')는 setDoc(merge)에서
+                // 중첩 필드로 인식되지 않아 today 카운트가 저장되지 않는 문제가 있었습니다.
+                // 실제 중첩 객체 구조로 넘겨야 byDate 안의 오늘 날짜 필드만 정확히 증가합니다.
+                const update = {
+                    total: increment(1),
+                    byDate: { [today]: increment(1) }
+                };
                 setDoc(ref, update, { merge: true }).catch(function (e) { console.error('방문자수 증가 실패:', e); });
             }
         }
