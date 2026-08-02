@@ -88,6 +88,11 @@
         html.fs-5 .text-\[10px\] { font-size: 14px !important; }
         html.fs-5 .text-\[11px\] { font-size: 15px !important; }
 
+        /* 헤더의 글자크기 설정/로그인 버튼은 본문 글자크기 단계와 무관하게
+           항상 작은 크기로 고정 (커질수록 헤더가 한 줄을 넘어가는 문제 방지) */
+        .hdr-text-10 { font-size: 10px !important; }
+        .hdr-text-11 { font-size: 11px !important; }
+
         html, body {
             margin: 0;
             overflow-x: hidden;
@@ -111,7 +116,7 @@
     <div class="sticky top-0 z-50">
         <!-- 헤더 영역 -->
         <header class="border-b border-stone-200/60 bg-white/80 backdrop-blur-md">
-            <div class="max-w-xl md:max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+            <div class="max-w-xl md:max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
                 <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-stone-100 rounded-full overflow-hidden border border-stone-200">
                     <img src="한다원.394.394_2.png" alt="한다원 로고" class="w-full h-full object-contain block" 
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -119,11 +124,11 @@
                 </div>
                 <div class="flex-grow"></div>
                 <div id="fs-toggle" class="flex-shrink-0 flex items-center gap-1 bg-stone-100 rounded-full pl-2 pr-1 py-1">
-                    <span class="text-[10px] font-bold text-stone-600 whitespace-nowrap">글자크기:<span id="fs-level-label">1</span></span>
-                    <button id="fs-btn-decrease" onclick="changeFontSize(-1)" aria-label="글자 작게" class="w-6 h-6 flex-shrink-0 flex items-center justify-center text-[11px] font-bold bg-white text-stone-600 hover:bg-stone-200 transition-colors rounded-full leading-none">−</button>
-                    <button id="fs-btn-increase" onclick="changeFontSize(1)" aria-label="글자 크게" class="w-6 h-6 flex-shrink-0 flex items-center justify-center text-[11px] font-bold bg-white text-stone-600 hover:bg-stone-200 transition-colors rounded-full leading-none">+</button>
+                    <span class="hdr-text-10 font-bold text-stone-600 whitespace-nowrap">글자크기:<span id="fs-level-label">1</span></span>
+                    <button id="fs-btn-decrease" onclick="changeFontSize(-1)" aria-label="글자 작게" class="w-6 h-6 flex-shrink-0 flex items-center justify-center hdr-text-11 font-bold bg-white text-stone-600 hover:bg-stone-200 transition-colors rounded-full leading-none">−</button>
+                    <button id="fs-btn-increase" onclick="changeFontSize(1)" aria-label="글자 크게" class="w-6 h-6 flex-shrink-0 flex items-center justify-center hdr-text-11 font-bold bg-white text-stone-600 hover:bg-stone-200 transition-colors rounded-full leading-none">+</button>
                 </div>
-                <button id="auth-btn" onclick="openAuthModal()" class="flex-shrink-0 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5 hover:bg-emerald-100 transition-colors whitespace-nowrap">
+                <button id="auth-btn" onclick="openAuthModal()" class="flex-shrink-0 hdr-text-11 font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5 hover:bg-emerald-100 transition-colors whitespace-nowrap">
                     <i class="fa-solid fa-user mr-1"></i><span id="auth-btn-label">로그인</span>
                 </button>
             </div>
