@@ -198,13 +198,17 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 mb-1"><i class="fa-solid fa-ruler-vertical mr-1 text-emerald-800"></i> 키 (cm)</label>
+                        <input type="number" id="user-height-input" placeholder="예: 170" min="1" max="250" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50/50 text-sm focus:outline-emerald-800 focus:bg-white transition-all">
+                    </div>
                     <div>
                         <label class="block text-xs font-bold text-stone-600 mb-1"><i class="fa-solid fa-weight-scale mr-1 text-emerald-800"></i> 체중 (kg)</label>
                         <input type="number" id="user-weight-input" placeholder="예: 65" min="1" max="200" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50/50 text-sm focus:outline-emerald-800 focus:bg-white transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-stone-600 mb-1"><i class="fa-solid fa-heart-pulse mr-1 text-emerald-800"></i> 혈압 (수축기/이완기)</label>
+                        <label class="block text-xs font-bold text-stone-600 mb-1"><i class="fa-solid fa-heart-pulse mr-1 text-emerald-800"></i> 혈압</label>
                         <input type="text" id="user-bp-input" placeholder="예: 120/80" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50/50 text-sm focus:outline-emerald-800 focus:bg-white transition-all">
                     </div>
                 </div>
@@ -232,6 +236,14 @@
 
         <!-- [1] 정기 사용자 개인화 메인 대시보드 화면 -->
         <div id="main-dashboard" class="hidden">
+            <div id="default-profile-banner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3.5 mb-4 flex items-center justify-between gap-3 flex-wrap">
+                <p class="text-[11px] text-amber-900 leading-relaxed">
+                    <i class="fa-solid fa-circle-info mr-1"></i>지금 보이는 정보는 <b>예시 데이터</b>입니다. 화면을 둘러보신 뒤, 본인에게 맞는 정보로 바꿔보세요.
+                </p>
+                <button onclick="openProfileEditor()" class="flex-shrink-0 bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] transition-all whitespace-nowrap">
+                    내 정보로 수정하기
+                </button>
+            </div>
             <div class="md:flex md:gap-4 md:items-start">
                 <div class="contents space-y-4 md:flex md:flex-col md:gap-4 md:space-y-0 md:flex-1 md:min-w-0">
             <!-- 종합 약선 추천식사 TOP5 중 1·2순위 하이라이트 -->
@@ -365,7 +377,7 @@
                 </button>
             </div>
             <div class="pt-2 break-inside-avoid">
-                <button onclick="resetUserProfile()" class="w-full bg-stone-800 hover:bg-stone-900 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-md transition-all active:scale-[0.99]">
+                <button onclick="openProfileEditor()" class="w-full bg-stone-800 hover:bg-stone-900 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-md transition-all active:scale-[0.99]">
                     <i class="fa-solid fa-arrows-rotate"></i> <span>건강 정보 및 프로필 등록 / 변경하기</span>
                 </button>
             </div>
@@ -1052,15 +1064,19 @@
         }
 
         function checkUserProfile() {
-            const profile = JSON.parse(localStorage.getItem('sasang_user_profile'));
+            let profile = JSON.parse(localStorage.getItem('sasang_user_profile') || 'null');
+
             if (!profile) {
-                welcomeScreen.classList.remove('hidden');
-                mainDashboard.classList.add('hidden');
-            } else {
-                welcomeScreen.classList.add('hidden');
-                mainDashboard.classList.remove('hidden');
-                renderDashboard(profile);
+                // 처음 방문한 사용자는 빈 등록화면 대신, 예시 건강정보로 바로 서비스를 체험할 수 있게 합니다.
+                // "건강 정보 및 프로필 등록/변경하기" 버튼에서 언제든 본인 정보로 바꿀 수 있습니다.
+                profile = getDefaultProfile();
+                localStorage.setItem('sasang_user_profile', JSON.stringify(profile));
+                localStorage.setItem('sasang_is_default_profile', '1');
             }
+
+            welcomeScreen.classList.add('hidden');
+            mainDashboard.classList.remove('hidden');
+            renderDashboard(profile);
         }
 
         function addMealRecord() {
@@ -1306,11 +1322,14 @@
 
         function renderDashboard(profile) {
             const constData = resultsData[profile.constitution];
-            
+
+            const defaultBanner = document.getElementById('default-profile-banner');
+            if (defaultBanner) defaultBanner.classList.toggle('hidden', localStorage.getItem('sasang_is_default_profile') !== '1');
+
             document.getElementById('dash-user-name').innerText = profile.name;
             const genderText = profile.gender === 'male' ? "남성" : "여성";
             
-            document.getElementById('dash-user-meta').innerText = `만 ${profile.age}세 · ${genderText} [${profile.weight}kg · ${profile.bp}]`;
+            document.getElementById('dash-user-meta').innerText = `만 ${profile.age}세 · ${genderText} [${profile.height ? profile.height + 'cm · ' : ''}${profile.weight}kg · ${profile.bp}]`;
             document.getElementById('dash-user-constitution').innerText = `체질: ${constData.name} (${constData.subtitle})`;
             
             const nowTime = new Date();
@@ -1470,31 +1489,61 @@
             const name = document.getElementById('user-name-input').value.trim();
             const gender = document.getElementById('user-gender-input').value;
             const birth = document.getElementById('user-birth-input').value;
+            const height = document.getElementById('user-height-input').value.trim();
             const weight = document.getElementById('user-weight-input').value.trim();
             const bp = document.getElementById('user-bp-input').value.trim();
 
-            if (!name || !birth || !weight || !bp) {
+            if (!name || !birth || !height || !weight || !bp) {
                 alert("건강 정보를 모두 정확히 입력해 주세요.");
                 return;
             }
 
             const age = calculateAge(birth);
-            const profile = { name, gender, birth, weight, bp, age, constitution: type };
+            const profile = { name, gender, birth, height, weight, bp, age, constitution: type };
             localStorage.setItem('sasang_user_profile', JSON.stringify(profile));
+            localStorage.removeItem('sasang_is_default_profile');
             checkUserProfile();
         }
 
         function resetUserProfile() {
             localStorage.removeItem('sasang_user_profile');
+            localStorage.removeItem('sasang_is_default_profile');
             checkUserProfile();
+        }
+
+        // 건강정보 등록/수정 화면을 열면서, 기존 값(또는 기본 예시값)을 입력칸에 미리 채워줍니다.
+        function openProfileEditor() {
+            const profile = JSON.parse(localStorage.getItem('sasang_user_profile') || 'null') || getDefaultProfile();
+            document.getElementById('user-name-input').value = profile.name || '';
+            document.getElementById('user-gender-input').value = profile.gender || 'male';
+            document.getElementById('user-birth-input').value = profile.birth || '';
+            document.getElementById('user-height-input').value = profile.height || '';
+            document.getElementById('user-weight-input').value = profile.weight || '';
+            document.getElementById('user-bp-input').value = profile.bp || '';
+
+            welcomeScreen.classList.remove('hidden');
+            mainDashboard.classList.add('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        // 처음 방문한 사용자가 빈 등록화면부터 마주치지 않도록, 예시 건강정보로 바로 체험할 수 있게 합니다.
+        // 화면 아래 "건강 정보 및 프로필 등록/변경하기" 버튼에서 언제든 본인 정보로 바꿀 수 있습니다.
+        function getDefaultProfile() {
+            const birth = '1983-05-10';
+            return {
+                name: '홍길동', gender: 'male', birth: birth,
+                height: '174', weight: '70', bp: '120/80',
+                age: calculateAge(birth), constitution: 'C'
+            };
         }
 
         function startDiagnosticTest() {
             const name = document.getElementById('user-name-input').value.trim();
             const birth = document.getElementById('user-birth-input').value;
+            const height = document.getElementById('user-height-input').value.trim();
             const weight = document.getElementById('user-weight-input').value.trim();
             const bp = document.getElementById('user-bp-input').value.trim();
-            if (!name || !birth || !weight || !bp) {
+            if (!name || !birth || !height || !weight || !bp) {
                 alert("정밀 진단을 시작하기 전 건강 정보를 모두 입력해 주세요.");
                 return;
             }
@@ -1560,12 +1609,14 @@
             const name = document.getElementById('user-name-input').value.trim();
             const gender = document.getElementById('user-gender-input').value;
             const birth = document.getElementById('user-birth-input').value;
+            const height = document.getElementById('user-height-input').value.trim();
             const weight = document.getElementById('user-weight-input').value.trim();
             const bp = document.getElementById('user-bp-input').value.trim();
             const age = calculateAge(birth);
 
-            const profile = { name, gender, birth, weight, bp, age, constitution: maxType };
+            const profile = { name, gender, birth, height, weight, bp, age, constitution: maxType };
             localStorage.setItem('sasang_user_profile', JSON.stringify(profile));
+            localStorage.removeItem('sasang_is_default_profile');
             checkUserProfile();
         }
 
