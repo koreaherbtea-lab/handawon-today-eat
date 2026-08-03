@@ -307,14 +307,14 @@
                 </div>
                 <div class="contents space-y-4 md:flex md:flex-col md:gap-4 md:space-y-0 md:flex-1 md:min-w-0">
             <div class="bg-white rounded-2xl border border-stone-200/80 shadow-xl p-4 flex flex-col space-y-3 break-inside-avoid mt-4 md:mt-0">
-                <div class="flex items-center justify-between border-b border-stone-100 pb-2">
-                    <div>
-                        <h2 class="text-base font-bold text-stone-900 font-traditional"><span id="dash-user-name" class="text-emerald-800">사용자</span>님의 정보</h2>
-                        <p id="dash-user-meta" class="text-[11px] text-stone-500 font-medium">성별 · 나이 로딩 중</p>
-                        <p id="dash-user-constitution" class="text-xs text-stone-700 font-bold mt-0.5">체질 정보 로딩 중</p>
-                        <div id="dash-user-fortune" class="text-xs text-stone-700 bg-stone-50 border border-stone-200/60 px-2.5 py-1.5 rounded-xl mt-2 font-medium leading-relaxed"></div>
-                    </div>
-                    <span id="dash-gender-icon" class="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 text-xs"></span>
+                <div class="border-b border-stone-100 pb-2">
+                    <h2 class="text-base font-bold text-stone-900 font-traditional flex items-center gap-1.5 flex-wrap">
+                        <span><span id="dash-user-name" class="text-emerald-800">사용자</span>님의 정보</span>
+                        <span id="dash-user-gender-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full border"></span>
+                    </h2>
+                    <p id="dash-user-meta" class="text-[11px] text-stone-500 font-medium">나이 로딩 중</p>
+                    <p id="dash-user-constitution" class="text-xs text-stone-700 font-bold mt-0.5">체질 정보 로딩 중</p>
+                    <div id="dash-user-fortune" class="text-[11px] text-stone-700 bg-stone-50 border border-stone-200/40 p-2.5 rounded-xl mt-2 font-medium leading-relaxed"></div>
                 </div>
                 
                 <div class="grid grid-cols-3 gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200/40 text-[11px]">
@@ -1327,9 +1327,13 @@
             if (defaultBanner) defaultBanner.classList.toggle('hidden', localStorage.getItem('sasang_is_default_profile') !== '1');
 
             document.getElementById('dash-user-name').innerText = profile.name;
-            const genderText = profile.gender === 'male' ? "남성" : "여성";
-            
-            document.getElementById('dash-user-meta').innerText = `만 ${profile.age}세 · ${genderText} [${profile.height ? profile.height + 'cm · ' : ''}${profile.weight}kg · ${profile.bp}]`;
+            const isMale = profile.gender === 'male';
+            const genderBadge = document.getElementById('dash-user-gender-badge');
+            genderBadge.innerText = isMale ? '남성' : '여성';
+            genderBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded-full border ' +
+                (isMale ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200');
+
+            document.getElementById('dash-user-meta').innerText = `만 ${profile.age}세 [${profile.height ? profile.height + 'cm · ' : ''}${profile.weight}kg · ${profile.bp}]`;
             document.getElementById('dash-user-constitution').innerText = `체질: ${constData.name} (${constData.subtitle})`;
             
             const nowTime = new Date();
@@ -1359,15 +1363,6 @@
             
             const periodLabelMap = { breakfast: "실시간 아침 처방", lunch: "실시간 점심 처방", dinner: "실시간 저녁 처방" };
             document.getElementById('dash-meal-period').innerText = periodLabelMap[mealPeriod];
-
-            const genderIconContainer = document.getElementById('dash-gender-icon');
-            if(profile.gender === 'male') {
-                genderIconContainer.innerHTML = `<i class="fa-solid fa-mars text-sky-600"></i>`;
-                genderIconContainer.className = "w-7 h-7 rounded-full bg-sky-50 flex items-center justify-center shrink-0";
-            } else {
-                genderIconContainer.innerHTML = `<i class="fa-solid fa-venus text-rose-500"></i>`;
-                genderIconContainer.className = "w-7 h-7 rounded-full bg-rose-50 flex items-center justify-center shrink-0";
-            }
 
             const periodKey = mealPeriod;
             let recommendedFoods = [...coreFoodPrescription[profile.constitution][periodKey]];
